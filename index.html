@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -9,491 +9,390 @@
 <title>TimeTrack</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-
 <style>
-  :root {
-    --bg: #0e0e0f;
-    --surface: #181819;
-    --surface2: #222224;
-    --border: #2a2a2d;
-    --text: #f0ede8;
-    --muted: #6b6b70;
-    --green: #4ade80;
-    --green-dim: rgba(74,222,128,0.12);
-    --amber: #fbbf24;
-    --red: #f87171;
-    --accent: #e8e0d5;
-    --radius: 16px;
-  }
+:root {
+  --bg: #0e0e0f;
+  --surface: #181819;
+  --surface2: #222224;
+  --border: #2a2a2d;
+  --text: #f0ede8;
+  --muted: #6b6b70;
+  --green: #4ade80;
+  --green-dim: rgba(74,222,128,0.12);
+  --amber: #fbbf24;
+  --red: #f87171;
+  --accent: #e8e0d5;
+  --radius: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'DM Mono',monospace;
+  min-height:100vh; min-height:-webkit-fill-available;
+  padding-bottom:env(safe-area-inset-bottom);
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* ─── SCREENS ─── */
+.screen { display:none; min-height:100vh; flex-direction:column; }
+.screen.active { display:flex; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+/* ─── LOGIN ─── */
+#loginScreen {
+  align-items:center; justify-content:center; padding:40px 24px;
+  background:radial-gradient(ellipse at 50% 0%, #1a2a1a 0%, var(--bg) 60%);
+}
+.login-logo {
+  font-family:'Instrument Serif',serif;
+  font-size:72px; color:var(--green); letter-spacing:-3px; margin-bottom:6px; line-height:1;
+}
+.login-sub {
+  color:var(--muted); font-size:11px; letter-spacing:4px;
+  text-transform:uppercase; margin-bottom:72px;
+}
+.biometric-btn {
+  width:88px; height:88px; border-radius:50%;
+  border:1.5px solid var(--green); background:var(--green-dim);
+  color:var(--green); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s; position:relative; margin-bottom:20px;
+}
+.biometric-btn:active { transform:scale(0.94); background:rgba(74,222,128,0.25); }
+.biometric-btn .pulse-ring {
+  position:absolute; inset:-10px; border-radius:50%;
+  border:1.5px solid var(--green); opacity:0;
+  animation:pulse-out 2.4s ease-out infinite;
+}
+/* SVG fingerprint icon inside button */
+.bio-icon { width:36px; height:36px; stroke:var(--green); fill:none; stroke-width:1.5; stroke-linecap:round; }
+@keyframes pulse-out {
+  0% { opacity:0.5; transform:scale(1); }
+  100% { opacity:0; transform:scale(1.45); }
+}
+.login-hint { color:var(--muted); font-size:12px; text-align:center; }
+.login-fallback { margin-top:32px; color:var(--muted); font-size:11px; cursor:pointer; text-decoration:underline; }
+#pwFallback { display:none; flex-direction:column; align-items:center; gap:12px; margin-top:28px; width:100%; max-width:280px; }
+#pwFallback input {
+  width:100%; padding:14px 16px; background:var(--surface);
+  border:1px solid var(--border); border-radius:12px; color:var(--text);
+  font-family:'DM Mono',monospace; font-size:18px; outline:none;
+  text-align:center; letter-spacing:6px;
+}
+#pwFallback button {
+  width:100%; padding:14px; background:var(--green); color:#000;
+  border:none; border-radius:12px; font-family:'DM Mono',monospace;
+  font-weight:500; font-size:14px; cursor:pointer; letter-spacing:1px;
+}
+.login-error { color:var(--red); font-size:12px; margin-top:8px; min-height:18px; text-align:center; }
 
-  /* ─── SCREENS ─── */
-  .screen { display: none; min-height: 100vh; flex-direction: column; }
-  .screen.active { display: flex; }
+/* ─── TOPBAR ─── */
+#appScreen { padding:0; }
+.topbar {
+  padding:52px 20px 14px;
+  display:grid; grid-template-columns:40px 1fr 40px; align-items:center;
+}
+.topbar-back {
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--muted); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.topbar-center { text-align:center; }
+.topbar-title { font-family:'Instrument Serif',serif; font-size:28px; color:var(--accent); line-height:1; }
+.topbar-week { font-size:10px; color:var(--muted); letter-spacing:1px; margin-top:3px; }
+.topbar-settings {
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--muted); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.settings-icon { width:18px; height:18px; stroke:var(--muted); fill:none; stroke-width:1.5; }
 
-  /* ─── LOGIN ─── */
-  #loginScreen {
-    align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    background: radial-gradient(ellipse at 50% 0%, #1a2a1a 0%, var(--bg) 60%);
-  }
+/* ─── WEEKLY CARD ─── */
+.weekly-card {
+  margin:0 16px 14px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius); padding:20px;
+}
+.hours-display { display:flex; align-items:baseline; gap:8px; margin-bottom:4px; }
+.hours-big {
+  font-family:'Instrument Serif',serif; font-size:56px; line-height:1;
+  color:var(--green); transition:color 0.4s;
+}
+.hours-big.warn { color:var(--amber); }
+.hours-big.danger { color:var(--red); }
+.hours-label { font-size:11px; color:var(--muted); letter-spacing:1px; align-self:flex-end; padding-bottom:10px; }
+.progress-track { height:4px; background:var(--surface2); border-radius:2px; margin:16px 0 8px; overflow:hidden; }
+.progress-bar {
+  height:100%; border-radius:2px; background:var(--green);
+  transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1), background 0.4s; max-width:100%;
+}
+.progress-bar.warn { background:var(--amber); }
+.progress-bar.danger { background:var(--red); }
+.progress-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); }
+.status-msg { margin-top:14px; font-size:11px; line-height:1.7; }
+.status-msg.good { color:var(--green); }
+.status-msg.warn { color:var(--amber); }
+.status-msg.danger { color:var(--red); }
 
-  .login-logo {
-    font-family: 'Instrument Serif', serif;
-    font-size: 48px;
-    color: var(--green);
-    letter-spacing: -2px;
-    margin-bottom: 8px;
-  }
+/* ─── LOG BUTTON ─── */
+.log-btn-wrap { padding:0 16px 14px; }
+.log-btn {
+  width:100%; padding:18px; background:var(--green); color:#000;
+  border:none; border-radius:var(--radius); font-family:'DM Mono',monospace;
+  font-weight:500; font-size:15px; cursor:pointer; letter-spacing:0.5px;
+  transition:opacity 0.15s, transform 0.1s;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.log-btn:active { opacity:0.85; transform:scale(0.98); }
 
-  .login-sub {
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 64px;
-  }
+/* ─── WEEK ACCORDION ─── */
+.section-label { padding:0 20px 10px; font-size:10px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
+.weeks-list { padding:0 16px; display:flex; flex-direction:column; gap:10px; padding-bottom:32px; }
 
-  .biometric-btn {
-    width: 96px; height: 96px;
-    border-radius: 50%;
-    border: 2px solid var(--green);
-    background: var(--green-dim);
-    color: var(--green);
-    font-size: 36px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-    position: relative;
-    margin-bottom: 20px;
-  }
+.week-accordion {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; overflow:hidden;
+}
+.week-accordion-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px; cursor:pointer; user-select:none;
+}
+.week-accordion-header:active { background:var(--surface2); }
+.week-acc-left { display:flex; flex-direction:column; gap:3px; }
+.week-acc-range { font-size:13px; color:var(--accent); }
+.week-acc-sub { font-size:10px; color:var(--muted); letter-spacing:1px; }
+.week-acc-right { display:flex; align-items:center; gap:10px; }
+.week-acc-total { font-family:'Instrument Serif',serif; font-size:20px; color:var(--green); }
+.week-acc-total.warn { color:var(--amber); }
+.week-acc-total.danger { color:var(--red); }
+.week-acc-chevron {
+  width:20px; height:20px; stroke:var(--muted); fill:none;
+  stroke-width:2; transition:transform 0.25s;
+}
+.week-accordion.open .week-acc-chevron { transform:rotate(180deg); }
+.week-accordion-body { display:none; border-top:1px solid var(--border); padding:12px; display:flex; flex-direction:column; gap:8px; }
+.week-accordion:not(.open) .week-accordion-body { display:none; }
+.week-accordion.open .week-accordion-body { display:flex; }
 
-  .biometric-btn:active { transform: scale(0.94); background: rgba(74,222,128,0.25); }
+.day-card {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:14px; animation:fade-up 0.25s ease;
+}
+@keyframes fade-up { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.day-card-header { display:flex; justify-content:space-between; align-items:flex-start; }
+.day-date { font-size:13px; color:var(--accent); }
+.day-badges { display:flex; gap:6px; align-items:center; }
+.day-total { font-size:15px; color:var(--green); font-family:'Instrument Serif',serif; }
+.badge-ho {
+  font-size:9px; letter-spacing:1px; color:var(--amber);
+  border:1px solid rgba(251,191,36,0.4); border-radius:4px; padding:2px 5px;
+}
+.day-times { margin-top:8px; display:flex; flex-direction:column; gap:3px; }
+.day-time-row { display:flex; gap:6px; align-items:center; font-size:11px; color:var(--muted); }
+.day-time-row span { color:var(--text); }
+.day-card-actions { display:flex; gap:8px; margin-top:10px; }
+.day-action-btn {
+  padding:5px 12px; border-radius:8px; border:1px solid var(--border);
+  background:transparent; color:var(--muted); font-family:'DM Mono',monospace;
+  font-size:11px; cursor:pointer;
+}
+.day-action-btn.del { color:var(--red); border-color:rgba(248,113,113,0.3); }
+.empty-state { text-align:center; padding:40px 24px; color:var(--muted); font-size:12px; line-height:2; }
 
-  .biometric-btn .pulse-ring {
-    position: absolute;
-    inset: -8px;
-    border-radius: 50%;
-    border: 1.5px solid var(--green);
-    opacity: 0;
-    animation: pulse-out 2.4s ease-out infinite;
-  }
+/* ─── MODALS ─── */
+.modal-overlay {
+  position:fixed; inset:0; z-index:100;
+  background:rgba(0,0,0,0.72); backdrop-filter:blur(10px);
+  display:flex; align-items:flex-end; padding:16px;
+}
+.modal-overlay.hidden { display:none; }
+.modal {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px 20px 12px 12px; padding:24px 22px 28px;
+  width:100%; animation:slide-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  max-height:88vh; overflow-y:auto;
+}
+@keyframes slide-up { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-title { font-family:'Instrument Serif',serif; font-size:24px; color:var(--accent); margin-bottom:20px; }
+.field-group { margin-bottom:14px; }
+.field-label { font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:6px; }
+.time-row { display:flex; gap:8px; }
+.time-input {
+  flex:1; padding:13px 8px; background:var(--surface2);
+  border:1px solid var(--border); border-radius:10px; color:var(--text);
+  font-family:'DM Mono',monospace; font-size:15px; outline:none; text-align:center;
+  min-width:0;
+}
+.time-input:focus { border-color:var(--green); }
+.date-input {
+  width:100%; padding:13px 12px; background:var(--surface2);
+  border:1px solid var(--border); border-radius:10px; color:var(--text);
+  font-family:'DM Mono',monospace; font-size:15px; outline:none;
+}
+.date-input:focus { border-color:var(--green); }
 
-  @keyframes pulse-out {
-    0% { opacity: 0.6; transform: scale(1); }
-    100% { opacity: 0; transform: scale(1.4); }
-  }
+/* toggle row */
+.toggle-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:12px; background:var(--surface2); border-radius:10px; }
+.toggle-label { font-size:12px; color:var(--muted); flex:1; line-height:1.4; }
+.toggle { position:relative; width:44px; height:26px; flex-shrink:0; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider {
+  position:absolute; inset:0; background:var(--surface2);
+  border:1px solid var(--border); border-radius:13px; cursor:pointer; transition:all 0.2s;
+}
+.toggle-slider:before {
+  content:''; position:absolute; height:20px; width:20px;
+  left:2px; bottom:2px; background:var(--muted); border-radius:50%; transition:all 0.2s;
+}
+input:checked + .toggle-slider { background:var(--green-dim); border-color:var(--green); }
+input:checked + .toggle-slider:before { transform:translateX(18px); background:var(--green); }
 
-  .login-hint { color: var(--muted); font-size: 12px; text-align: center; }
-  .login-fallback { margin-top: 32px; color: var(--muted); font-size: 11px; cursor: pointer; text-decoration: underline; }
+/* homeoffice toggle */
+.ho-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:12px; background:var(--surface2); border-radius:10px; }
+.ho-label { font-size:12px; color:var(--muted); flex:1; }
 
-  /* password fallback */
-  #pwFallback { display: none; flex-direction: column; align-items: center; gap: 12px; margin-top: 32px; width: 100%; max-width: 280px; }
-  #pwFallback input {
-    width: 100%;
-    padding: 14px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 16px;
-    outline: none;
-    text-align: center;
-    letter-spacing: 4px;
-  }
-  #pwFallback button {
-    width: 100%;
-    padding: 14px;
-    background: var(--green);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    letter-spacing: 1px;
-  }
+/* photo section */
+.photo-btn {
+  width:100%; padding:13px; background:transparent;
+  border:1px dashed var(--border); border-radius:10px; color:var(--muted);
+  font-family:'DM Mono',monospace; font-size:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-bottom:14px; transition:border-color 0.2s, color 0.2s;
+}
+.photo-btn:active { border-color:var(--green); color:var(--green); }
+#photoInput { display:none; }
 
-  .login-error { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 18px; }
+.preview-hours { font-size:12px; color:var(--green); margin-top:8px; min-height:18px; }
+.form-error { font-size:11px; color:var(--red); margin-top:6px; min-height:16px; }
+.modal-actions { display:flex; gap:10px; margin-top:18px; }
+.modal-cancel {
+  flex:1; padding:15px; background:transparent; border:1px solid var(--border);
+  border-radius:12px; color:var(--muted); font-family:'DM Mono',monospace;
+  font-size:14px; cursor:pointer;
+}
+.modal-save {
+  flex:2; padding:15px; background:var(--green); border:none;
+  border-radius:12px; color:#000; font-family:'DM Mono',monospace;
+  font-weight:500; font-size:14px; cursor:pointer;
+}
 
-  /* ─── FIREBASE SETUP MODAL ─── */
-  #setupModal {
-    position: fixed; inset: 0; z-index: 200;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    padding: 48px 24px 32px;
-    overflow-y: auto;
-  }
+/* ─── SETTINGS MODAL ─── */
+#settingsModal .modal { border-radius:20px 20px 12px 12px; }
+.settings-section { margin-bottom:20px; }
+.settings-section-title { font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
+.settings-row { display:flex; align-items:center; justify-content:space-between; padding:14px; background:var(--surface2); border-radius:10px; margin-bottom:8px; }
+.settings-row-label { font-size:13px; color:var(--text); }
+.settings-row-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.settings-input {
+  width:80px; padding:8px 10px; background:var(--bg);
+  border:1px solid var(--border); border-radius:8px; color:var(--text);
+  font-family:'DM Mono',monospace; font-size:15px; outline:none; text-align:center;
+}
+.settings-input:focus { border-color:var(--green); }
+.settings-save {
+  width:100%; padding:16px; background:var(--green); color:#000;
+  border:none; border-radius:12px; font-family:'DM Mono',monospace;
+  font-weight:500; font-size:14px; cursor:pointer; margin-top:8px;
+}
 
-  #setupModal.hidden { display: none; }
+/* AI loading indicator */
+.ai-loading {
+  display:none; align-items:center; gap:10px; padding:12px;
+  background:var(--green-dim); border:1px solid rgba(74,222,128,0.3);
+  border-radius:10px; margin-bottom:14px; font-size:12px; color:var(--green);
+}
+.ai-loading.visible { display:flex; }
+.ai-spinner {
+  width:16px; height:16px; border:2px solid var(--green-dim);
+  border-top-color:var(--green); border-radius:50%;
+  animation:spin 0.7s linear infinite; flex-shrink:0;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
 
-  .setup-title { font-family: 'Instrument Serif', serif; font-size: 28px; color: var(--green); margin-bottom: 8px; }
-  .setup-desc { color: var(--muted); font-size: 12px; line-height: 1.8; margin-bottom: 28px; }
-  .setup-step { margin-bottom: 24px; }
-  .setup-step-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
-  .setup-step input, .setup-step textarea {
-    width: 100%;
-    padding: 12px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    outline: none;
-    resize: none;
-  }
-  .setup-step textarea { height: 100px; }
-  .setup-btn {
-    width: 100%;
-    padding: 16px;
-    background: var(--green);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 8px;
-  }
-  .setup-link { color: var(--green); }
-  .setup-note { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; font-size: 11px; line-height: 1.8; color: var(--muted); margin-bottom: 16px; }
-  .setup-note code { color: var(--accent); background: var(--surface2); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
-
-  /* ─── MAIN APP ─── */
-  #appScreen { padding: 0; }
-
-  .topbar {
-    padding: 56px 24px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-
-  .topbar-title { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--accent); }
-  .topbar-week { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
-
-  .logout-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* ─── WEEKLY CARD ─── */
-  .weekly-card {
-    margin: 0 16px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-  }
-
-  .hours-display {
-    display: flex; align-items: baseline; gap: 8px;
-    margin-bottom: 4px;
-  }
-
-  .hours-big {
-    font-family: 'Instrument Serif', serif;
-    font-size: 52px;
-    line-height: 1;
-    color: var(--green);
-    transition: color 0.4s;
-  }
-
-  .hours-big.warn { color: var(--amber); }
-  .hours-big.danger { color: var(--red); }
-
-  .hours-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; align-self: flex-end; padding-bottom: 8px; }
-
-  .progress-track {
-    height: 4px; background: var(--surface2); border-radius: 2px; margin: 16px 0 8px; overflow: hidden;
-  }
-
-  .progress-bar {
-    height: 100%; border-radius: 2px;
-    background: var(--green);
-    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1), background 0.4s;
-    max-width: 100%;
-  }
-
-  .progress-bar.warn { background: var(--amber); }
-  .progress-bar.danger { background: var(--red); }
-
-  .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
-
-  .status-msg { margin-top: 14px; font-size: 11px; line-height: 1.7; }
-  .status-msg.good { color: var(--green); }
-  .status-msg.warn { color: var(--amber); }
-  .status-msg.danger { color: var(--red); }
-
-  /* ─── LOG BUTTON ─── */
-  .log-btn-wrap { padding: 0 16px 16px; }
-
-  .log-btn {
-    width: 100%;
-    padding: 18px;
-    background: var(--green);
-    color: #000;
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-    font-size: 15px;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    transition: opacity 0.15s, transform 0.1s;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-
-  .log-btn:active { opacity: 0.85; transform: scale(0.98); }
-
-  /* ─── HISTORY ─── */
-  .section-label {
-    padding: 0 20px 10px;
-    font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase;
-  }
-
-  .history-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 32px; }
-
-  .day-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    animation: fade-up 0.3s ease;
-  }
-
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .day-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .day-date { font-size: 13px; color: var(--accent); }
-  .day-total { font-size: 16px; color: var(--green); font-family: 'Instrument Serif', serif; }
-  .day-times { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
-  .day-time-row { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--muted); }
-  .day-time-row span { color: var(--text); }
-  .day-card-actions { display: flex; gap: 8px; margin-top: 12px; }
-  .day-action-btn {
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-  }
-  .day-action-btn.del { color: var(--red); border-color: rgba(248,113,113,0.3); }
-
-  .empty-state { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 12px; line-height: 2; }
-
-  /* ─── MODAL ─── */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    display: flex; align-items: flex-end;
-    padding: 16px;
-  }
-
-  .modal-overlay.hidden { display: none; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px 20px 12px 12px;
-    padding: 28px 24px 32px;
-    width: 100%;
-    animation: slide-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
-  }
-
-  @keyframes slide-up {
-    from { transform: translateY(40px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  .modal-title {
-    font-family: 'Instrument Serif', serif;
-    font-size: 22px; color: var(--accent);
-    margin-bottom: 20px;
-  }
-
-  .field-group { margin-bottom: 16px; }
-  .field-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-
-  .time-row { display: flex; gap: 8px; }
-
-  .time-input {
-    flex: 1;
-    padding: 14px 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 16px;
-    outline: none;
-    text-align: center;
-  }
-
-  .time-input:focus { border-color: var(--green); }
-
-  .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-  .toggle-label { font-size: 12px; color: var(--muted); }
-
-  .toggle {
-    position: relative; width: 44px; height: 26px;
-    flex-shrink: 0;
-  }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0;
-    background: var(--surface2);
-    border-radius: 13px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .toggle-slider:before {
-    content: '';
-    position: absolute;
-    height: 20px; width: 20px;
-    left: 3px; bottom: 3px;
-    background: var(--muted);
-    border-radius: 50%;
-    transition: all 0.2s;
-  }
-  input:checked + .toggle-slider { background: var(--green-dim); border: 1px solid var(--green); }
-  input:checked + .toggle-slider:before { transform: translateX(18px); background: var(--green); }
-
-  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-  .modal-cancel {
-    flex: 1; padding: 16px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .modal-save {
-    flex: 2; padding: 16px;
-    background: var(--green);
-    border: none;
-    border-radius: 12px;
-    color: #000;
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
-  .preview-hours { font-size: 12px; color: var(--green); margin-top: 10px; min-height: 18px; }
-  .form-error { font-size: 11px; color: var(--red); margin-top: 6px; min-height: 16px; }
-
-  .date-input {
-    width: 100%;
-    padding: 14px 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 16px;
-    outline: none;
-  }
-  .date-input:focus { border-color: var(--green); }
-
-  /* scrollable content area */
-  .scroll-content { flex: 1; overflow-y: auto; }
-
-  ::-webkit-scrollbar { display: none; }
+.scroll-content { flex:1; overflow-y:auto; }
+::-webkit-scrollbar { display:none; }
 </style>
 </head>
 <body>
 
-<!-- setup modal hidden, config hardcoded -->
+<!-- hidden setup modal placeholder -->
 <div id="setupModal" style="display:none"></div>
 
-<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<!-- ══════════════ LOGIN ══════════════ -->
 <div id="loginScreen" class="screen">
   <div class="login-logo">tt.</div>
   <div class="login-sub">Time Tracker</div>
 
   <button class="biometric-btn" id="bioBtn" onclick="doBiometric()">
     <div class="pulse-ring"></div>
-    <span>🪪</span>
+    <!-- Fingerprint SVG icon -->
+    <svg class="bio-icon" viewBox="0 0 24 24">
+      <path d="M12 2C8.5 2 5.5 3.8 3.8 6.5"/>
+      <path d="M20.2 6.5C18.5 3.8 15.5 2 12 2"/>
+      <path d="M2 12c0-1 .2-2 .5-2.9"/>
+      <path d="M21.5 9.1C21.8 10 22 11 22 12"/>
+      <path d="M12 7c-2.8 0-5 2.2-5 5 0 3.5-.8 5.5-1.5 6.5"/>
+      <path d="M17 12c0-2.8-2.2-5-5-5"/>
+      <path d="M12 17c0 2 .3 3.5.8 4.5"/>
+      <path d="M17.5 18.5c.3-1 .5-2.2.5-3.5v-3"/>
+      <path d="M12 12v3"/>
+    </svg>
   </button>
   <div class="login-hint" id="bioHint">Touch ID / Face ID</div>
   <div class="login-error" id="loginError"></div>
 
   <div id="pwFallback">
-    <input type="password" id="pwInput" placeholder="password" onkeydown="if(event.key==='Enter')doPassword()">
-    <button onclick="doPassword()">Unlock</button>
+    <input type="password" id="pwInput" placeholder="••••" onkeydown="if(event.key==='Enter')doPassword()">
+    <button onclick="doPassword()">Entsperren</button>
   </div>
-
-  <span class="login-fallback" onclick="togglePwFallback()">Use password instead</span>
+  <span class="login-fallback" onclick="togglePwFallback()">Passwort verwenden</span>
 </div>
 
 <!-- ══════════════ MAIN APP ══════════════ -->
 <div id="appScreen" class="screen">
   <div class="topbar">
-    <div>
-      <div class="topbar-title">This Week</div>
+    <button class="topbar-back" onclick="logout()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div class="topbar-center">
+      <div class="topbar-title">Diese Woche</div>
       <div class="topbar-week" id="weekRange"></div>
     </div>
-    <button class="logout-btn" onclick="logout()">↩</button>
+    <button class="topbar-settings" onclick="openSettings()">
+      <svg class="settings-icon" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </div>
 
   <div class="scroll-content">
-    <!-- Weekly summary card -->
     <div class="weekly-card">
       <div class="hours-display">
         <div class="hours-big" id="totalHoursDisplay">0:00</div>
-        <div class="hours-label">HOURS THIS WEEK</div>
+        <div class="hours-label">STUNDEN DIESE WOCHE</div>
       </div>
       <div class="progress-track">
         <div class="progress-bar" id="progressBar"></div>
       </div>
       <div class="progress-labels">
         <span>0h</span>
-        <span>19h target</span>
-        <span>20h max</span>
+        <span id="targetLabel">19h Ziel</span>
+        <span id="maxLabel">20h max</span>
       </div>
       <div class="status-msg good" id="statusMsg"></div>
     </div>
 
-    <!-- Log time button -->
     <div class="log-btn-wrap">
       <button class="log-btn" onclick="openLogModal()">
-        <span>＋</span> Log a Day
+        <span style="font-size:18px;font-weight:300">＋</span> Tag erfassen
       </button>
     </div>
 
-    <!-- History -->
-    <div class="section-label">WEEK HISTORY</div>
-    <div class="history-list" id="historyList">
-      <div class="empty-state">No entries yet.<br>Tap <em>Log a Day</em> to start.</div>
+    <div class="section-label">VERLAUF</div>
+    <div class="weeks-list" id="weeksList">
+      <div class="empty-state">Noch keine Einträge.<br>Tippe auf <em>Tag erfassen</em>.</div>
     </div>
   </div>
 </div>
@@ -501,43 +400,120 @@
 <!-- ══════════════ LOG MODAL ══════════════ -->
 <div class="modal-overlay hidden" id="logModal">
   <div class="modal">
-    <div class="modal-title" id="modalTitle">Log a Day</div>
+    <div class="modal-title" id="modalTitle">Tag erfassen</div>
+
+    <!-- Photo button -->
+    <button class="photo-btn" onclick="triggerPhoto()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      Foto des Stechzettels hochladen
+    </button>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+
+    <div class="ai-loading" id="aiLoading">
+      <div class="ai-spinner"></div>
+      KI liest Zeiten aus dem Foto…
+    </div>
 
     <div class="field-group">
-      <div class="field-label">Date</div>
+      <div class="field-label">Datum</div>
       <input type="date" class="date-input" id="entryDate">
     </div>
 
-    <div class="field-group">
-      <div class="field-label">Morning shift</div>
-      <div class="time-row">
-        <input type="time" class="time-input" id="t1In" placeholder="08:00">
-        <input type="time" class="time-input" id="t1Out" placeholder="12:00">
-      </div>
-    </div>
-
+    <!-- Toggle: Auto-Pause -->
     <div class="toggle-row">
       <label class="toggle">
-        <input type="checkbox" id="hasBreak" onchange="toggleBreakRow()" checked>
+        <input type="checkbox" id="autoPause" onchange="togglePauseMode()">
         <span class="toggle-slider"></span>
       </label>
-      <span class="toggle-label">Lunch break (auto 30 min) / custom</span>
+      <span class="toggle-label">Auto 30 min Pause — nur Start- & Endzeit eingeben</span>
     </div>
 
-    <div class="field-group" id="breakRow">
-      <div class="field-label">Afternoon shift</div>
-      <div class="time-row">
-        <input type="time" class="time-input" id="t2In" placeholder="12:30">
-        <input type="time" class="time-input" id="t2Out" placeholder="16:30">
+    <!-- MANUAL MODE: 4 Felder -->
+    <div id="manualFields">
+      <div class="field-group">
+        <div class="field-label">Vormittag</div>
+        <div class="time-row">
+          <input type="time" class="time-input" id="t1In" placeholder="08:00">
+          <input type="time" class="time-input" id="t1Out" placeholder="12:00">
+        </div>
       </div>
+      <div class="field-group">
+        <div class="field-label">Nachmittag</div>
+        <div class="time-row">
+          <input type="time" class="time-input" id="t2In" placeholder="12:30">
+          <input type="time" class="time-input" id="t2Out" placeholder="16:30">
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTO MODE: nur Start & Ende -->
+    <div id="autoFields" style="display:none">
+      <div class="field-group">
+        <div class="field-label">Arbeitsbeginn → Arbeitsende</div>
+        <div class="time-row">
+          <input type="time" class="time-input" id="dayStart" placeholder="08:00">
+          <input type="time" class="time-input" id="dayEnd" placeholder="16:30">
+        </div>
+      </div>
+    </div>
+
+    <!-- Homeoffice -->
+    <div class="ho-row">
+      <label class="toggle">
+        <input type="checkbox" id="isHomeoffice">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="ho-label">Homeoffice</span>
     </div>
 
     <div class="preview-hours" id="previewHours"></div>
     <div class="form-error" id="formError"></div>
 
     <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeLogModal()">Cancel</button>
-      <button class="modal-save" onclick="saveEntry()">Save</button>
+      <button class="modal-cancel" onclick="closeLogModal()">Abbrechen</button>
+      <button class="modal-save" onclick="saveEntry()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SETTINGS MODAL ══════════════ -->
+<div class="modal-overlay hidden" id="settingsModal">
+  <div class="modal">
+    <div class="modal-title">Einstellungen</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Arbeitszeitvorgaben</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Ziel (Mindeststunden)</div>
+          <div class="settings-row-sub">Grüner Bereich bis hierher</div>
+        </div>
+        <input type="number" class="settings-input" id="settingTarget" min="1" max="60" value="19">
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Maximum (Höchststunden)</div>
+          <div class="settings-row-sub">Warnung ab hier</div>
+        </div>
+        <input type="number" class="settings-input" id="settingMax" min="1" max="60" value="20">
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Passwort ändern</div>
+      <div class="field-group">
+        <input type="password" class="date-input" id="newPassword" placeholder="Neues Passwort" style="margin-bottom:8px">
+        <input type="password" class="date-input" id="newPasswordConfirm" placeholder="Wiederholen">
+      </div>
+      <div class="form-error" id="pwChangeError"></div>
+    </div>
+
+    <button class="settings-save" onclick="saveSettings()">Speichern</button>
+    <div class="modal-actions" style="margin-top:10px">
+      <button class="modal-cancel" onclick="closeSettings()">Schließen</button>
     </div>
   </div>
 </div>
@@ -545,34 +521,92 @@
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, Timestamp }
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// ─── CONFIG ───────────────────────────────────────────
+// ─── CONSTANTS ────────────────────────────────────────
 const APP_PASSWORD_KEY = 'tt_password_hash';
-const FIREBASE_CONFIG_KEY = 'tt_firebase_config';
-const BIOMETRIC_KEY = 'tt_biometric_registered';
-const SESSION_KEY = 'tt_session';
+const BIOMETRIC_KEY    = 'tt_biometric_registered';
+const SESSION_KEY      = 'tt_session';
+const SETTINGS_KEY     = 'tt_settings';
 
 let db = null;
 let editingId = null;
+let settings = { target: 19, max: 20 };
+
+// ─── SETTINGS ─────────────────────────────────────────
+function loadSettings() {
+  const s = localStorage.getItem(SETTINGS_KEY);
+  if (s) settings = JSON.parse(s);
+  document.getElementById('settingTarget').value = settings.target;
+  document.getElementById('settingMax').value    = settings.max;
+  document.getElementById('targetLabel').textContent = settings.target + 'h Ziel';
+  document.getElementById('maxLabel').textContent    = settings.max + 'h max';
+}
+
+window.openSettings = function() {
+  document.getElementById('settingTarget').value = settings.target;
+  document.getElementById('settingMax').value    = settings.max;
+  document.getElementById('pwChangeError').textContent = '';
+  document.getElementById('newPassword').value = '';
+  document.getElementById('newPasswordConfirm').value = '';
+  document.getElementById('settingsModal').classList.remove('hidden');
+};
+window.closeSettings = function() {
+  document.getElementById('settingsModal').classList.add('hidden');
+};
+window.saveSettings = async function() {
+  const t = parseInt(document.getElementById('settingTarget').value);
+  const m = parseInt(document.getElementById('settingMax').value);
+  if (isNaN(t)||isNaN(m)||t<1||m<1||t>=m) {
+    document.getElementById('pwChangeError').textContent = 'Ziel muss kleiner als Maximum sein.'; return;
+  }
+  settings = { target: t, max: m };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  document.getElementById('targetLabel').textContent = t + 'h Ziel';
+  document.getElementById('maxLabel').textContent    = m + 'h max';
+
+  // Password change
+  const np = document.getElementById('newPassword').value;
+  const nc = document.getElementById('newPasswordConfirm').value;
+  if (np) {
+    if (np !== nc) { document.getElementById('pwChangeError').textContent = 'Passwörter stimmen nicht überein.'; return; }
+    localStorage.setItem(APP_PASSWORD_KEY, await sha256(np));
+  }
+
+  closeSettings();
+  loadWeek();
+};
 
 // ─── UTILS ────────────────────────────────────────────
-function getWeekBounds() {
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun
+function getWeekBounds(date) {
+  const now = date || new Date();
+  const day = now.getDay();
   const monday = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  monday.setDate(now.getDate() - (day===0 ? 6 : day-1));
   monday.setHours(0,0,0,0);
   const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
+  sunday.setDate(monday.getDate()+6);
   sunday.setHours(23,59,59,999);
   return { monday, sunday };
 }
 
+function weekStartFromDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = d.getDay();
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - (day===0 ? 6 : day-1));
+  return mon.toISOString().split('T')[0];
+}
+
 function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-DE', { weekday:'short', day:'numeric', month:'short' });
+  return d.toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'short' });
+}
+
+function formatWeekRange(monday, sunday) {
+  const fmt = d => d.toLocaleDateString('de-DE', { day:'numeric', month:'short' });
+  return fmt(monday) + ' – ' + fmt(sunday);
 }
 
 function timeToMinutes(t) {
@@ -587,15 +621,22 @@ function minutesToHHMM(min) {
   return `${h}:${String(m).padStart(2,'0')}`;
 }
 
+function addMinutesToTime(t, add) {
+  const m = timeToMinutes(t) + add;
+  return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+}
+
 function calcMinutes(entry) {
-  const m1in = timeToMinutes(entry.t1In);
+  if (entry.autoPause && entry.dayStart && entry.dayEnd) {
+    const total = timeToMinutes(entry.dayEnd) - timeToMinutes(entry.dayStart) - 30;
+    return total > 0 ? total : 0;
+  }
+  const m1in  = timeToMinutes(entry.t1In);
   const m1out = timeToMinutes(entry.t1Out);
   if (m1in===null||m1out===null) return 0;
   let total = m1out - m1in;
-  if (entry.hasBreak && entry.t2In && entry.t2Out) {
-    const m2in = timeToMinutes(entry.t2In);
-    const m2out = timeToMinutes(entry.t2Out);
-    total += m2out - m2in;
+  if (entry.t2In && entry.t2Out) {
+    total += timeToMinutes(entry.t2Out) - timeToMinutes(entry.t2In);
   }
   return total > 0 ? total : 0;
 }
@@ -605,29 +646,7 @@ async function sha256(str) {
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ─── SETUP ────────────────────────────────────────────
-window.saveSetup = async function() {
-  const raw = document.getElementById('configInput').value.trim();
-  const pw = document.getElementById('setupPassword').value;
-  const err = document.getElementById('setupError');
-  err.textContent = '';
-
-  if (!pw) { err.textContent = 'Please set a password.'; return; }
-
-  let cfg;
-  try {
-    const clean = raw.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-    cfg = JSON.parse(clean);
-    if (!cfg.projectId) throw new Error();
-  } catch(e) { err.textContent = 'Invalid config — paste the full firebaseConfig object.'; return; }
-
-  localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(cfg));
-  localStorage.setItem(APP_PASSWORD_KEY, await sha256(pw));
-  document.getElementById('setupModal').classList.add('hidden');
-  initApp();
-};
-
-// ─── FIREBASE INIT ────────────────────────────────────
+// ─── FIREBASE ─────────────────────────────────────────
 function initFirebase(cfg) {
   const app = initializeApp(cfg);
   db = getFirestore(app);
@@ -639,32 +658,30 @@ async function registerBiometric() {
     const cred = await navigator.credentials.create({
       publicKey: {
         challenge: crypto.getRandomValues(new Uint8Array(32)),
-        rp: { name: 'TimeTrack' },
-        user: { id: new Uint8Array([1]), name: 'user', displayName: 'User' },
+        rp: { name:'TimeTrack' },
+        user: { id:new Uint8Array([1]), name:'user', displayName:'User' },
         pubKeyCredParams: [{ type:'public-key', alg:-7 },{ type:'public-key', alg:-257 }],
         authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required' },
-        timeout: 60000
+        timeout:60000
       }
     });
-    const stored = { id: cred.id, rawId: btoa(String.fromCharCode(...new Uint8Array(cred.rawId))) };
-    localStorage.setItem(BIOMETRIC_KEY, JSON.stringify(stored));
+    localStorage.setItem(BIOMETRIC_KEY, JSON.stringify({
+      id:cred.id,
+      rawId:btoa(String.fromCharCode(...new Uint8Array(cred.rawId)))
+    }));
     return true;
   } catch(e) { return false; }
 }
 
 async function verifyBiometric() {
-  const stored = JSON.parse(localStorage.getItem(BIOMETRIC_KEY) || 'null');
-  if (!stored) {
-    // First time: register
-    return await registerBiometric();
-  }
+  const stored = JSON.parse(localStorage.getItem(BIOMETRIC_KEY)||'null');
+  if (!stored) return await registerBiometric();
   try {
     await navigator.credentials.get({
       publicKey: {
-        challenge: crypto.getRandomValues(new Uint8Array(32)),
-        allowCredentials: [{ type:'public-key', id: Uint8Array.from(atob(stored.rawId), c=>c.charCodeAt(0)) }],
-        userVerification: 'required',
-        timeout: 60000
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials:[{ type:'public-key', id:Uint8Array.from(atob(stored.rawId),c=>c.charCodeAt(0)) }],
+        userVerification:'required', timeout:60000
       }
     });
     return true;
@@ -674,172 +691,220 @@ async function verifyBiometric() {
 window.doBiometric = async function() {
   document.getElementById('loginError').textContent = '';
   const btn = document.getElementById('bioBtn');
-  btn.style.opacity = '0.6';
+  btn.style.opacity = '0.5';
   try {
-    const ok = await verifyBiometric();
-    if (ok) { unlockApp(); }
-    else { document.getElementById('loginError').textContent = 'Authentication failed.'; }
+    if (await verifyBiometric()) unlockApp();
+    else document.getElementById('loginError').textContent = 'Authentifizierung fehlgeschlagen.';
   } catch(e) {
-    document.getElementById('loginError').textContent = 'Biometrics not available on this device.';
+    document.getElementById('loginError').textContent = 'Biometrie nicht verfügbar.';
   }
   btn.style.opacity = '1';
 };
 
 window.togglePwFallback = function() {
   const el = document.getElementById('pwFallback');
-  el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+  el.style.display = el.style.display==='flex' ? 'none' : 'flex';
 };
 
 window.doPassword = async function() {
   const pw = document.getElementById('pwInput').value;
-  const hash = await sha256(pw);
-  const stored = localStorage.getItem(APP_PASSWORD_KEY);
-  if (hash === stored) { unlockApp(); }
-  else { document.getElementById('loginError').textContent = 'Wrong password.'; }
+  if ((await sha256(pw)) === localStorage.getItem(APP_PASSWORD_KEY)) unlockApp();
+  else document.getElementById('loginError').textContent = 'Falsches Passwort.';
 };
 
 function unlockApp() {
-  sessionStorage.setItem(SESSION_KEY, '1');
+  sessionStorage.setItem(SESSION_KEY,'1');
   showScreen('appScreen');
   loadWeek();
 }
-
 window.logout = function() {
   sessionStorage.removeItem(SESSION_KEY);
   showScreen('loginScreen');
 };
-
-// ─── SCREENS ──────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ─── LOAD WEEK ────────────────────────────────────────
+// ─── LOAD DATA ────────────────────────────────────────
 async function loadWeek() {
+  loadSettings();
   const { monday, sunday } = getWeekBounds();
-  document.getElementById('weekRange').textContent =
-    monday.toLocaleDateString('en-DE',{day:'numeric',month:'short'}) + ' – ' +
-    sunday.toLocaleDateString('en-DE',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('weekRange').textContent = formatWeekRange(monday, sunday);
 
-  // Fetch entries from Firestore
-  let entries = [];
+  let allEntries = [];
   try {
-    const q = query(collection(db,'entries'),
-      where('weekStart','==', monday.toISOString().split('T')[0]));
-    const snap = await getDocs(q);
-    snap.forEach(d => entries.push({ id:d.id, ...d.data() }));
-  } catch(e) {
-    console.error('Firestore error', e);
-  }
+    const snap = await getDocs(collection(db,'entries'));
+    snap.forEach(d => allEntries.push({ id:d.id, ...d.data() }));
+  } catch(e) { console.error('Firestore error', e); }
 
-  // Sort by date desc
-  entries.sort((a,b)=> b.date.localeCompare(a.date));
-
-  // Total
+  // current week total
+  const thisWeekStart = monday.toISOString().split('T')[0];
+  const thisWeek = allEntries.filter(e => e.weekStart === thisWeekStart);
   let totalMin = 0;
-  entries.forEach(e => totalMin += calcMinutes(e));
-
+  thisWeek.forEach(e => totalMin += calcMinutes(e));
   updateSummary(totalMin);
-  renderHistory(entries);
+
+  // Group by weekStart for accordion
+  const weeks = {};
+  allEntries.forEach(e => {
+    if (!weeks[e.weekStart]) weeks[e.weekStart] = [];
+    weeks[e.weekStart].push(e);
+  });
+
+  // Sort week keys descending
+  const weekKeys = Object.keys(weeks).sort((a,b)=>b.localeCompare(a));
+  renderWeekAccordion(weekKeys, weeks);
 }
 
 function updateSummary(totalMin) {
   const display = document.getElementById('totalHoursDisplay');
-  const bar = document.getElementById('progressBar');
-  const msg = document.getElementById('statusMsg');
+  const bar     = document.getElementById('progressBar');
+  const msg     = document.getElementById('statusMsg');
+  const target  = settings.target * 60;
+  const max     = settings.max * 60;
 
   display.textContent = minutesToHHMM(totalMin);
-  const pct = Math.min((totalMin / (20*60)) * 100, 100);
+  const pct = Math.min((totalMin / max) * 100, 100);
   bar.style.width = pct + '%';
-
-  const toTarget = 19*60 - totalMin;
-  const overMax = totalMin - 20*60;
 
   display.className = 'hours-big';
   bar.className = 'progress-bar';
   msg.className = 'status-msg';
 
-  if (totalMin < 19*60) {
-    msg.textContent = `${minutesToHHMM(toTarget)} still needed to reach 19h target`;
+  if (totalMin < target) {
+    msg.textContent = `Noch ${minutesToHHMM(target - totalMin)} bis zum ${settings.target}h-Ziel`;
     msg.classList.add('good');
-  } else if (totalMin <= 20*60) {
-    const rem = 20*60 - totalMin;
-    msg.textContent = `✓ Target reached! ${minutesToHHMM(rem)} buffer before 20h cap`;
+  } else if (totalMin <= max) {
+    msg.textContent = `✓ Ziel erreicht! Noch ${minutesToHHMM(max - totalMin)} Puffer bis ${settings.max}h`;
     msg.classList.add('warn');
     display.classList.add('warn');
     bar.classList.add('warn');
   } else {
-    msg.textContent = `⚠ Over 20h limit by ${minutesToHHMM(overMax)}`;
+    msg.textContent = `⚠ ${minutesToHHMM(totalMin - max)} über dem ${settings.max}h-Limit`;
     msg.classList.add('danger');
     display.classList.add('danger');
     bar.classList.add('danger');
   }
 }
 
-function renderHistory(entries) {
-  const list = document.getElementById('historyList');
-  if (entries.length === 0) {
-    list.innerHTML = '<div class="empty-state">No entries yet.<br>Tap <em>Log a Day</em> to start.</div>';
+function renderWeekAccordion(weekKeys, weeks) {
+  const list = document.getElementById('weeksList');
+  if (weekKeys.length === 0) {
+    list.innerHTML = '<div class="empty-state">Noch keine Einträge.<br>Tippe auf <em>Tag erfassen</em>.</div>';
     return;
   }
   list.innerHTML = '';
-  entries.forEach(entry => {
-    const min = calcMinutes(entry);
-    const card = document.createElement('div');
-    card.className = 'day-card';
-    let timesHTML = `
-      <div class="day-time-row">Morning <span>${entry.t1In} → ${entry.t1Out}</span></div>`;
-    if (entry.hasBreak && entry.t2In) {
-      timesHTML += `<div class="day-time-row">Afternoon <span>${entry.t2In} → ${entry.t2Out}</span></div>`;
-    }
-    card.innerHTML = `
-      <div class="day-card-header">
-        <div class="day-date">${formatDate(entry.date)}</div>
-        <div class="day-total">${minutesToHHMM(min)}h</div>
+  const { monday } = getWeekBounds();
+  const thisWeekStart = monday.toISOString().split('T')[0];
+
+  weekKeys.forEach((wk, idx) => {
+    const entries = weeks[wk].sort((a,b)=>b.date.localeCompare(a.date));
+    const weekTotal = entries.reduce((s,e)=>s+calcMinutes(e),0);
+
+    // week label
+    const wkMon = new Date(wk + 'T00:00:00');
+    const wkSun = new Date(wkMon); wkSun.setDate(wkMon.getDate()+6);
+    const range = formatWeekRange(wkMon, wkSun);
+    const isThis = wk === thisWeekStart;
+
+    const totalClass = weekTotal >= settings.max*60 ? 'danger' : weekTotal >= settings.target*60 ? 'warn' : '';
+
+    const acc = document.createElement('div');
+    acc.className = 'week-accordion' + (isThis ? ' open' : '');
+    acc.innerHTML = `
+      <div class="week-accordion-header" onclick="toggleAccordion(this)">
+        <div class="week-acc-left">
+          <div class="week-acc-range">${range}</div>
+          <div class="week-acc-sub">${isThis ? 'DIESE WOCHE' : entries.length + ' TAG' + (entries.length!==1?'E':'')}</div>
+        </div>
+        <div class="week-acc-right">
+          <div class="week-acc-total ${totalClass}">${minutesToHHMM(weekTotal)}h</div>
+          <svg class="week-acc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
       </div>
-      <div class="day-times">${timesHTML}</div>
-      <div class="day-card-actions">
-        <button class="day-action-btn" onclick="openEdit('${entry.id}')">Edit</button>
-        <button class="day-action-btn del" onclick="deleteEntry('${entry.id}')">Delete</button>
+      <div class="week-accordion-body" id="week-body-${wk}">
+        ${entries.map(e => renderDayCard(e)).join('')}
       </div>`;
-    list.appendChild(card);
+    list.appendChild(acc);
   });
 }
 
-// ─── MODAL ────────────────────────────────────────────
+window.toggleAccordion = function(header) {
+  const acc = header.closest('.week-accordion');
+  acc.classList.toggle('open');
+};
+
+function renderDayCard(entry) {
+  const min = calcMinutes(entry);
+  let timesHTML = '';
+  if (entry.autoPause && entry.dayStart) {
+    const breakStart = addMinutesToTime(entry.dayEnd, -( timeToMinutes(entry.dayEnd) - timeToMinutes(entry.dayStart) - min ));
+    timesHTML = `
+      <div class="day-time-row">Start <span>${entry.dayStart}</span></div>
+      <div class="day-time-row">Pause <span>30 min (auto)</span></div>
+      <div class="day-time-row">Ende <span>${entry.dayEnd}</span></div>`;
+  } else {
+    if (entry.t1In) timesHTML += `<div class="day-time-row">Vormittag <span>${entry.t1In} → ${entry.t1Out}</span></div>`;
+    if (entry.t2In) timesHTML += `<div class="day-time-row">Nachmittag <span>${entry.t2In} → ${entry.t2Out}</span></div>`;
+  }
+  const hoBadge = entry.homeoffice ? '<span class="badge-ho">HO</span>' : '';
+  return `
+    <div class="day-card">
+      <div class="day-card-header">
+        <div class="day-date">${formatDate(entry.date)}</div>
+        <div class="day-badges">${hoBadge}<div class="day-total">${minutesToHHMM(min)}h</div></div>
+      </div>
+      <div class="day-times">${timesHTML}</div>
+      <div class="day-card-actions">
+        <button class="day-action-btn" onclick="openEdit('${entry.id}')">Bearbeiten</button>
+        <button class="day-action-btn del" onclick="deleteEntry('${entry.id}')">Löschen</button>
+      </div>
+    </div>`;
+}
+
+// ─── LOG MODAL ────────────────────────────────────────
 window.openLogModal = function() {
   editingId = null;
-  document.getElementById('modalTitle').textContent = 'Log a Day';
+  document.getElementById('modalTitle').textContent = 'Tag erfassen';
   document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('t1In').value = '';
   document.getElementById('t1Out').value = '';
   document.getElementById('t2In').value = '';
   document.getElementById('t2Out').value = '';
-  document.getElementById('hasBreak').checked = true;
-  document.getElementById('breakRow').style.display = 'block';
+  document.getElementById('dayStart').value = '';
+  document.getElementById('dayEnd').value = '';
+  document.getElementById('autoPause').checked = false;
+  document.getElementById('isHomeoffice').checked = false;
+  document.getElementById('manualFields').style.display = 'block';
+  document.getElementById('autoFields').style.display = 'none';
   document.getElementById('previewHours').textContent = '';
   document.getElementById('formError').textContent = '';
+  document.getElementById('aiLoading').classList.remove('visible');
   document.getElementById('logModal').classList.remove('hidden');
 };
 
 window.openEdit = async function(id) {
-  // find entry
   const snap = await getDocs(collection(db,'entries'));
   let entry;
   snap.forEach(d => { if(d.id===id) entry = { id:d.id, ...d.data() }; });
   if (!entry) return;
   editingId = id;
-  document.getElementById('modalTitle').textContent = 'Edit Entry';
+  document.getElementById('modalTitle').textContent = 'Eintrag bearbeiten';
   document.getElementById('entryDate').value = entry.date;
-  document.getElementById('t1In').value = entry.t1In||'';
-  document.getElementById('t1Out').value = entry.t1Out||'';
-  document.getElementById('hasBreak').checked = !!entry.hasBreak;
-  document.getElementById('breakRow').style.display = entry.hasBreak ? 'block' : 'none';
-  document.getElementById('t2In').value = entry.t2In||'';
-  document.getElementById('t2Out').value = entry.t2Out||'';
+  document.getElementById('autoPause').checked = !!entry.autoPause;
+  document.getElementById('isHomeoffice').checked = !!entry.homeoffice;
+  document.getElementById('t1In').value   = entry.t1In||'';
+  document.getElementById('t1Out').value  = entry.t1Out||'';
+  document.getElementById('t2In').value   = entry.t2In||'';
+  document.getElementById('t2Out').value  = entry.t2Out||'';
+  document.getElementById('dayStart').value = entry.dayStart||'';
+  document.getElementById('dayEnd').value   = entry.dayEnd||'';
+  document.getElementById('manualFields').style.display = entry.autoPause ? 'none' : 'block';
+  document.getElementById('autoFields').style.display   = entry.autoPause ? 'block' : 'none';
   document.getElementById('previewHours').textContent = '';
   document.getElementById('formError').textContent = '';
+  document.getElementById('aiLoading').classList.remove('visible');
   document.getElementById('logModal').classList.remove('hidden');
 };
 
@@ -847,35 +912,37 @@ window.closeLogModal = function() {
   document.getElementById('logModal').classList.add('hidden');
 };
 
-window.toggleBreakRow = function() {
-  const has = document.getElementById('hasBreak').checked;
-  document.getElementById('breakRow').style.display = has ? 'block' : 'none';
+window.togglePauseMode = function() {
+  const auto = document.getElementById('autoPause').checked;
+  document.getElementById('manualFields').style.display = auto ? 'none' : 'block';
+  document.getElementById('autoFields').style.display   = auto ? 'block' : 'none';
   updatePreview();
 };
 
 // Live preview
-['t1In','t1Out','t2In','t2Out','hasBreak'].forEach(id => {
-  const el = document.getElementById(id);
-  if(el) el.addEventListener('change', updatePreview);
+['t1In','t1Out','t2In','t2Out','dayStart','dayEnd'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', updatePreview);
 });
+
+function getFormEntry() {
+  const auto = document.getElementById('autoPause').checked;
+  return {
+    date: document.getElementById('entryDate').value,
+    autoPause: auto,
+    t1In:  auto ? '' : document.getElementById('t1In').value,
+    t1Out: auto ? '' : document.getElementById('t1Out').value,
+    t2In:  auto ? '' : document.getElementById('t2In').value,
+    t2Out: auto ? '' : document.getElementById('t2Out').value,
+    dayStart: auto ? document.getElementById('dayStart').value : '',
+    dayEnd:   auto ? document.getElementById('dayEnd').value   : '',
+    homeoffice: document.getElementById('isHomeoffice').checked,
+  };
+}
 
 function updatePreview() {
   const entry = getFormEntry();
   const min = calcMinutes(entry);
-  const prev = document.getElementById('previewHours');
-  if (min > 0) prev.textContent = `= ${minutesToHHMM(min)} hours`;
-  else prev.textContent = '';
-}
-
-function getFormEntry() {
-  return {
-    date: document.getElementById('entryDate').value,
-    t1In: document.getElementById('t1In').value,
-    t1Out: document.getElementById('t1Out').value,
-    hasBreak: document.getElementById('hasBreak').checked,
-    t2In: document.getElementById('t2In').value,
-    t2Out: document.getElementById('t2Out').value,
-  };
+  document.getElementById('previewHours').textContent = min > 0 ? `= ${minutesToHHMM(min)} Stunden` : '';
 }
 
 window.saveEntry = async function() {
@@ -883,54 +950,107 @@ window.saveEntry = async function() {
   const err = document.getElementById('formError');
   err.textContent = '';
 
-  if (!entry.date || !entry.t1In || !entry.t1Out) {
-    err.textContent = 'Please fill in date and morning times.'; return;
-  }
-  if (timeToMinutes(entry.t1Out) <= timeToMinutes(entry.t1In)) {
-    err.textContent = 'Check-out must be after check-in.'; return;
-  }
-  if (entry.hasBreak) {
-    if (!entry.t2In || !entry.t2Out) {
-      // Auto 30 min break
-      const m1out = timeToMinutes(entry.t1Out);
-      const m2in = m1out + 30;
-      entry.t2In = `${Math.floor(m2in/60)}:${String(m2in%60).padStart(2,'0')}`;
+  if (!entry.date) { err.textContent = 'Bitte Datum auswählen.'; return; }
+
+  if (entry.autoPause) {
+    if (!entry.dayStart || !entry.dayEnd) { err.textContent = 'Bitte Start- und Endzeit eingeben.'; return; }
+    if (timeToMinutes(entry.dayEnd) <= timeToMinutes(entry.dayStart)+30) {
+      err.textContent = 'Mindestens 30 Min. Abstand für Pause nötig.'; return;
     }
-    if (timeToMinutes(entry.t2Out) <= timeToMinutes(entry.t2In)) {
-      err.textContent = 'Afternoon end must be after start.'; return;
+  } else {
+    if (!entry.t1In || !entry.t1Out) { err.textContent = 'Bitte Vormittagszeiten eingeben.'; return; }
+    if (timeToMinutes(entry.t1Out) <= timeToMinutes(entry.t1In)) { err.textContent = 'Ende muss nach Beginn liegen.'; return; }
+    if (entry.t2In && entry.t2Out && timeToMinutes(entry.t2Out) <= timeToMinutes(entry.t2In)) {
+      err.textContent = 'Nachmittag: Ende muss nach Beginn liegen.'; return;
     }
   }
 
-  const { monday } = getWeekBounds();
-  const entryDate = new Date(entry.date + 'T00:00:00');
-  const weekStart = monday.toISOString().split('T')[0];
-
-  // Compute weekStart from entry date
-  const d = entryDate.getDay();
-  const mon = new Date(entryDate);
-  mon.setDate(entryDate.getDate() - (d===0 ? 6 : d-1));
-  const entryWeekStart = mon.toISOString().split('T')[0];
-
-  const data = { ...entry, weekStart: entryWeekStart, updatedAt: Date.now() };
-
+  const data = { ...entry, weekStart: weekStartFromDate(entry.date), updatedAt: Date.now() };
   try {
-    if (editingId) {
-      await deleteDoc(doc(db,'entries',editingId));
-    }
+    if (editingId) await deleteDoc(doc(db,'entries',editingId));
     await addDoc(collection(db,'entries'), data);
     closeLogModal();
     loadWeek();
   } catch(e) {
-    err.textContent = 'Save failed. Check Firebase config.';
+    err.textContent = 'Speichern fehlgeschlagen. Firebase prüfen.';
     console.error(e);
   }
 };
 
 window.deleteEntry = async function(id) {
-  if (!confirm('Delete this entry?')) return;
+  if (!confirm('Eintrag löschen?')) return;
   await deleteDoc(doc(db,'entries',id));
   loadWeek();
 };
+
+// ─── PHOTO / AI ───────────────────────────────────────
+window.triggerPhoto = function() {
+  document.getElementById('photoInput').click();
+};
+
+window.handlePhoto = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const loader = document.getElementById('aiLoading');
+  loader.classList.add('visible');
+  document.getElementById('formError').textContent = '';
+
+  try {
+    const base64 = await fileToBase64(file);
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: file.type, data: base64 }
+            },
+            {
+              type: 'text',
+              text: `This is a timesheet or time-tracking card. Extract the work times for today or the most recent day shown. Respond ONLY with a JSON object like:
+{"date":"YYYY-MM-DD","t1In":"HH:MM","t1Out":"HH:MM","t2In":"HH:MM","t2Out":"HH:MM"}
+If there is no afternoon/break, omit t2In and t2Out. Use 24h format. If you cannot read a value, omit it. Return only valid JSON, no other text.`
+            }
+          ]
+        }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.map(b=>b.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+
+    if (parsed.date) document.getElementById('entryDate').value = parsed.date;
+    if (parsed.t1In)  { document.getElementById('t1In').value  = parsed.t1In;  }
+    if (parsed.t1Out) { document.getElementById('t1Out').value = parsed.t1Out; }
+    if (parsed.t2In)  { document.getElementById('t2In').value  = parsed.t2In;  }
+    if (parsed.t2Out) { document.getElementById('t2Out').value = parsed.t2Out; }
+    // Switch to manual mode if we got split times
+    document.getElementById('autoPause').checked = false;
+    document.getElementById('manualFields').style.display = 'block';
+    document.getElementById('autoFields').style.display   = 'none';
+    updatePreview();
+  } catch(e) {
+    document.getElementById('formError').textContent = 'KI konnte Zeiten nicht lesen. Bitte manuell eingeben.';
+    console.error(e);
+  }
+  loader.classList.remove('visible');
+  event.target.value = '';
+};
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
 
 // ─── INIT ─────────────────────────────────────────────
 const HARDCODED_CONFIG = {
@@ -943,29 +1063,18 @@ const HARDCODED_CONFIG = {
 };
 
 function initApp() {
-  // Always use hardcoded config, skip setup screen
-  document.getElementById('setupModal').classList.add('hidden');
   initFirebase(HARDCODED_CONFIG);
-
-  // Set default password "1234" if none configured yet
+  loadSettings();
   if (!localStorage.getItem(APP_PASSWORD_KEY)) {
     sha256('1234').then(h => localStorage.setItem(APP_PASSWORD_KEY, h));
   }
-
-  // Check session
-  if (sessionStorage.getItem(SESSION_KEY)) {
-    unlockApp(); return;
-  }
-
+  if (sessionStorage.getItem(SESSION_KEY)) { unlockApp(); return; }
   showScreen('loginScreen');
-
-  // Auto-trigger biometric if supported
   if (window.PublicKeyCredential && localStorage.getItem(BIOMETRIC_KEY)) {
-    document.getElementById('bioHint').textContent = 'Touch ID / Face ID';
-    setTimeout(()=> window.doBiometric(), 400);
+    setTimeout(() => window.doBiometric(), 400);
   } else if (!window.PublicKeyCredential) {
     document.getElementById('bioBtn').style.display = 'none';
-    document.getElementById('bioHint').textContent = 'Biometrics not supported on this browser';
+    document.getElementById('bioHint').textContent = 'Biometrie nicht verfügbar';
     window.togglePwFallback();
   }
 }
