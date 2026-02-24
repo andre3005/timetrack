@@ -10,14 +10,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0e0e0f;--surface:#181819;--surface2:#222224;--border:#2a2a2d;
-  --text:#f0ede8;--muted:#6b6b70;--green:#4ade80;--green-dim:rgba(74,222,128,0.12);
-  --amber:#fbbf24;--red:#f87171;--accent:#e8e0d5;--radius:16px;
+:root {
+  --bg:#0e0e0f; --surface:#181819; --surface2:#222224; --border:#2a2a2d;
+  --text:#f0ede8; --muted:#6b6b70; --green:#4ade80; --green-dim:rgba(74,222,128,0.12);
+  --amber:#fbbf24; --red:#f87171; --accent:#e8e0d5; --radius:16px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
   min-height:100vh;min-height:-webkit-fill-available;padding-bottom:env(safe-area-inset-bottom);}
+
 .screen{display:none;min-height:100vh;flex-direction:column;}
 .screen.active{display:flex;}
 
@@ -27,168 +28,173 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
 .login-logo{font-family:'Instrument Serif',serif;font-size:72px;color:var(--green);
   letter-spacing:-3px;margin-bottom:6px;line-height:1;}
 .login-sub{color:var(--muted);font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:64px;}
-.bio-btn{width:88px;height:88px;border-radius:50%;border:1.5px solid var(--green);
+.biometric-btn{width:88px;height:88px;border-radius:50%;border:1.5px solid var(--green);
   background:var(--green-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all 0.2s;position:relative;margin-bottom:20px;}
-.bio-btn:active{transform:scale(0.94);}
-.bio-btn .pulse-ring{position:absolute;inset:-10px;border-radius:50%;
+.biometric-btn:active{transform:scale(0.94);}
+.biometric-btn .pulse-ring{position:absolute;inset:-10px;border-radius:50%;
   border:1.5px solid var(--green);opacity:0;animation:pulse-out 2.4s ease-out infinite;}
 .bio-icon{width:36px;height:36px;stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round;}
-@keyframes pulse-out{0%{opacity:.5;transform:scale(1)}100%{opacity:0;transform:scale(1.45)}}
+@keyframes pulse-out{0%{opacity:0.5;transform:scale(1);}100%{opacity:0;transform:scale(1.45);}}
 .login-hint{color:var(--muted);font-size:12px;text-align:center;margin-bottom:8px;}
-.login-err{color:var(--red);font-size:12px;margin-top:8px;min-height:18px;text-align:center;}
-.login-link{margin-top:20px;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;}
-.login-form{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:280px;}
-.login-form input{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);
+.login-error{color:var(--red);font-size:12px;margin-top:8px;min-height:18px;text-align:center;}
+.login-fallback{margin-top:20px;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;}
+
+#pwForm{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:280px;}
+#pwForm input{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);
   border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:18px;outline:none;
   text-align:center;letter-spacing:6px;}
-.login-form input:focus{border-color:var(--green);}
-.login-form input.setup-input{letter-spacing:2px;font-size:15px;}
-.login-form .setup-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.7;letter-spacing:0;}
-.btn-green{width:100%;padding:14px;background:var(--green);color:#000;border:none;
+#pwForm input:focus{border-color:var(--green);}
+#pwForm button{width:100%;padding:14px;background:var(--green);color:#000;border:none;
+  border-radius:12px;font-family:'DM Mono',monospace;font-weight:500;font-size:14px;cursor:pointer;}
+
+#setupForm{display:none;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:280px;}
+.setup-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:4px;}
+#setupForm input{width:100%;padding:13px 16px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;outline:none;text-align:center;}
+#setupForm input:focus{border-color:var(--green);}
+#setupForm button{width:100%;padding:14px;background:var(--green);color:#000;border:none;
   border-radius:12px;font-family:'DM Mono',monospace;font-weight:500;font-size:14px;cursor:pointer;}
 
 /* TOPBAR */
 #appScreen{padding:0;}
 .topbar{padding:52px 20px 14px;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;}
-.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
-  background:var(--surface);color:var(--muted);cursor:pointer;flex-shrink:0;
+.topbar-back,.topbar-settings{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);cursor:pointer;
   display:flex;align-items:center;justify-content:center;}
 .topbar-center{text-align:center;}
 .topbar-title{font-family:'Instrument Serif',serif;font-size:28px;color:var(--accent);line-height:1;}
 .topbar-week{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:3px;}
+.settings-icon{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.5;}
 
 /* WEEKLY CARD */
 .weekly-card{margin:0 16px 14px;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:20px;}
 .hours-display{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
-.hours-big{font-family:'Instrument Serif',serif;font-size:56px;line-height:1;color:var(--green);transition:color .4s;}
+.hours-big{font-family:'Instrument Serif',serif;font-size:56px;line-height:1;color:var(--green);transition:color 0.4s;}
 .hours-big.warn{color:var(--amber);}
 .hours-big.danger{color:var(--red);}
 .hours-label{font-size:11px;color:var(--muted);letter-spacing:1px;align-self:flex-end;padding-bottom:10px;}
-.prog-track{height:4px;background:var(--surface2);border-radius:2px;margin:16px 0 8px;overflow:hidden;}
-.prog-bar{height:100%;border-radius:2px;background:var(--green);
-  transition:width .6s cubic-bezier(.34,1.56,.64,1),background .4s;max-width:100%;}
-.prog-bar.warn{background:var(--amber);}
-.prog-bar.danger{background:var(--red);}
-.prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);}
+.progress-track{height:4px;background:var(--surface2);border-radius:2px;margin:16px 0 8px;overflow:hidden;}
+.progress-bar{height:100%;border-radius:2px;background:var(--green);
+  transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1),background 0.4s;max-width:100%;}
+.progress-bar.warn{background:var(--amber);}
+.progress-bar.danger{background:var(--red);}
+.progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);}
 .status-msg{margin-top:14px;font-size:11px;line-height:1.7;}
 .status-msg.good{color:var(--green);}
 .status-msg.warn{color:var(--amber);}
 .status-msg.danger{color:var(--red);}
 
-/* LOG BTN */
+/* LOG BUTTON */
 .log-btn-wrap{padding:0 16px 14px;}
 .log-btn{width:100%;padding:18px;background:var(--green);color:#000;border:none;
   border-radius:var(--radius);font-family:'DM Mono',monospace;font-weight:500;font-size:15px;
-  cursor:pointer;transition:opacity .15s,transform .1s;
+  cursor:pointer;transition:opacity 0.15s,transform 0.1s;
   display:flex;align-items:center;justify-content:center;gap:10px;}
-.log-btn:active{opacity:.85;transform:scale(.98);}
+.log-btn:active{opacity:0.85;transform:scale(0.98);}
 
 /* HISTORY */
 .section-label{padding:0 20px 10px;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
 .weeks-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;padding-bottom:32px;}
-.week-acc{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.week-acc-hdr{display:flex;align-items:center;justify-content:space-between;
+.week-accordion{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.week-accordion-header{display:flex;align-items:center;justify-content:space-between;
   padding:16px;cursor:pointer;user-select:none;}
-.week-acc-hdr:active{background:var(--surface2);}
-.wah-left{display:flex;flex-direction:column;gap:3px;}
-.wah-range{font-size:13px;color:var(--accent);}
-.wah-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
-.wah-right{display:flex;align-items:center;gap:10px;}
-.wah-total{font-family:'Instrument Serif',serif;font-size:20px;color:var(--green);}
-.wah-total.warn{color:var(--amber);}
-.wah-total.danger{color:var(--red);}
-.wah-chevron{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2;transition:transform .25s;}
-.week-acc.open .wah-chevron{transform:rotate(180deg);}
-.week-acc-body{display:none;border-top:1px solid var(--border);padding:12px;flex-direction:column;gap:8px;}
-.week-acc.open .week-acc-body{display:flex;}
-.day-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;animation:fadeup .25s ease;}
-@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.dc-hdr{display:flex;justify-content:space-between;align-items:flex-start;}
-.dc-date{font-size:13px;color:var(--accent);}
-.dc-badges{display:flex;gap:6px;align-items:center;}
-.dc-total{font-size:15px;color:var(--green);font-family:'Instrument Serif',serif;}
+.week-accordion-header:active{background:var(--surface2);}
+.week-acc-left{display:flex;flex-direction:column;gap:3px;}
+.week-acc-range{font-size:13px;color:var(--accent);}
+.week-acc-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.week-acc-right{display:flex;align-items:center;gap:10px;}
+.week-acc-total{font-family:'Instrument Serif',serif;font-size:20px;color:var(--green);}
+.week-acc-total.warn{color:var(--amber);}
+.week-acc-total.danger{color:var(--red);}
+.week-acc-chevron{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2;transition:transform 0.25s;}
+.week-accordion.open .week-acc-chevron{transform:rotate(180deg);}
+.week-accordion-body{display:none;border-top:1px solid var(--border);padding:12px;flex-direction:column;gap:8px;}
+.week-accordion.open .week-accordion-body{display:flex;}
+.day-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;animation:fade-up 0.25s ease;}
+@keyframes fade-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.day-card-header{display:flex;justify-content:space-between;align-items:flex-start;}
+.day-date{font-size:13px;color:var(--accent);}
+.day-badges{display:flex;gap:6px;align-items:center;}
+.day-total{font-size:15px;color:var(--green);font-family:'Instrument Serif',serif;}
 .badge-ho{font-size:9px;letter-spacing:1px;color:var(--amber);
-  border:1px solid rgba(251,191,36,.4);border-radius:4px;padding:2px 5px;}
-.dc-times{margin-top:8px;display:flex;flex-direction:column;gap:3px;}
-.dc-row{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);}
-.dc-row span{color:var(--text);}
-.dc-actions{display:flex;gap:8px;margin-top:10px;}
-.dc-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);
+  border:1px solid rgba(251,191,36,0.4);border-radius:4px;padding:2px 5px;}
+.day-times{margin-top:8px;display:flex;flex-direction:column;gap:3px;}
+.day-time-row{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);}
+.day-time-row span{color:var(--text);}
+.day-card-actions{display:flex;gap:8px;margin-top:10px;}
+.day-action-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);
   background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
-.dc-btn.del{color:var(--red);border-color:rgba(248,113,113,.3);}
+.day-action-btn.del{color:var(--red);border-color:rgba(248,113,113,0.3);}
 .empty-state{text-align:center;padding:40px 24px;color:var(--muted);font-size:12px;line-height:2;}
 
-/* MODAL */
-.overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);
-  backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;padding:0;}
-.overlay.hidden{display:none;}
-.modal{background:var(--surface);border:1px solid var(--border);
-  border-radius:20px 20px 0 0;
-  padding:24px 20px calc(24px + env(safe-area-inset-bottom));
-  width:100%;max-width:600px;
-  animation:slideup .3s cubic-bezier(.34,1.2,.64,1);
-  max-height:92vh;overflow-y:auto;overflow-x:hidden;}
-@keyframes slideup{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.72);
+  backdrop-filter:blur(10px);display:flex;align-items:flex-end;padding:16px;}
+.modal-overlay.hidden{display:none;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 12px 12px;
+  padding:24px 22px 28px;width:100%;animation:slide-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  max-height:88vh;overflow-y:auto;}
+@keyframes slide-up{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-title{font-family:'Instrument Serif',serif;font-size:24px;color:var(--accent);margin-bottom:20px;}
-.field-group{margin-bottom:14px;width:100%;}
-.field-label{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
-.time-row{display:flex;gap:8px;width:100%;}
-.time-inp{flex:1;padding:13px 6px;background:var(--surface2);border:1px solid var(--border);
+.field-group{margin-bottom:14px;}
+.field-label{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.time-row{display:flex;gap:8px;}
+.time-input{flex:1;padding:13px 8px;background:var(--surface2);border:1px solid var(--border);
   border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;
-  text-align:center;min-width:0;width:100%;}
-.time-inp:focus{border-color:var(--green);}
-.date-inp{width:100%;padding:13px 12px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;
-  display:block;}
-.date-inp:focus{border-color:var(--green);}
-.tog-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px;
-  background:var(--surface2);border-radius:10px;width:100%;}
-.tog-label{font-size:12px;color:var(--muted);flex:1;line-height:1.4;min-width:0;}
-.tog{position:relative;width:44px;height:26px;flex-shrink:0;}
-.tog input{opacity:0;width:0;height:0;}
-.tog-slider{position:absolute;inset:0;background:var(--surface2);border:1px solid var(--border);
-  border-radius:13px;cursor:pointer;transition:all .2s;}
-.tog-slider:before{content:'';position:absolute;height:20px;width:20px;left:2px;bottom:2px;
-  background:var(--muted);border-radius:50%;transition:all .2s;}
-input:checked+.tog-slider{background:var(--green-dim);border-color:var(--green);}
-input:checked+.tog-slider:before{transform:translateX(18px);background:var(--green);}
+  text-align:center;min-width:0;}
+.time-input:focus{border-color:var(--green);}
+.date-input{width:100%;padding:13px 12px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;}
+.date-input:focus{border-color:var(--green);}
+.toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px;
+  background:var(--surface2);border-radius:10px;}
+.toggle-label{font-size:12px;color:var(--muted);flex:1;line-height:1.4;}
+.toggle{position:relative;width:44px;height:26px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--surface2);border:1px solid var(--border);
+  border-radius:13px;cursor:pointer;transition:all 0.2s;}
+.toggle-slider:before{content:'';position:absolute;height:20px;width:20px;left:2px;bottom:2px;
+  background:var(--muted);border-radius:50%;transition:all 0.2s;}
+input:checked+.toggle-slider{background:var(--green-dim);border-color:var(--green);}
+input:checked+.toggle-slider:before{transform:translateX(18px);background:var(--green);}
+.ho-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px;
+  background:var(--surface2);border-radius:10px;}
+.ho-label{font-size:12px;color:var(--muted);flex:1;}
 .photo-btn{width:100%;padding:13px;background:transparent;border:1px dashed var(--border);
   border-radius:10px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;}
 .photo-btn:active{border-color:var(--green);color:var(--green);}
 #photoInput{display:none;}
-.preview-hrs{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
-.form-err{font-size:11px;color:var(--red);margin-top:6px;min-height:16px;}
+.preview-hours{font-size:12px;color:var(--green);margin-top:8px;min-height:18px;}
+.form-error{font-size:11px;color:var(--red);margin-top:6px;min-height:16px;}
 .modal-actions{display:flex;gap:10px;margin-top:18px;}
-.btn-cancel{flex:1;padding:15px;background:transparent;border:1px solid var(--border);
+.modal-cancel{flex:1;padding:15px;background:transparent;border:1px solid var(--border);
   border-radius:12px;color:var(--muted);font-family:'DM Mono',monospace;font-size:14px;cursor:pointer;}
-.btn-save{flex:2;padding:15px;background:var(--green);border:none;border-radius:12px;
+.modal-save{flex:2;padding:15px;background:var(--green);border:none;border-radius:12px;
   color:#000;font-family:'DM Mono',monospace;font-weight:500;font-size:14px;cursor:pointer;}
 
 /* SETTINGS */
-.sett-section{margin-bottom:20px;}
-.sett-section-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
-.sett-row{display:flex;align-items:center;justify-content:space-between;padding:14px;
+.settings-section{margin-bottom:20px;}
+.settings-section-title{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px;
   background:var(--surface2);border-radius:10px;margin-bottom:8px;}
-.sett-row-label{font-size:13px;color:var(--text);}
-.sett-row-sub{font-size:10px;color:var(--muted);margin-top:2px;}
-.sett-inp{width:72px;padding:8px;background:var(--bg);border:1px solid var(--border);
+.settings-row-label{font-size:13px;color:var(--text);}
+.settings-row-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.settings-input{width:80px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);
   border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;text-align:center;}
-.sett-inp:focus{border-color:var(--green);}
-.sett-pw-inp{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;
-  margin-bottom:8px;display:block;}
-.sett-pw-inp:focus{border-color:var(--green);}
+.settings-input:focus{border-color:var(--green);}
+.settings-save{width:100%;padding:16px;background:var(--green);color:#000;border:none;
+  border-radius:12px;font-family:'DM Mono',monospace;font-weight:500;font-size:14px;cursor:pointer;margin-top:8px;}
 
 /* AI LOADER */
-.ai-load{display:none;align-items:center;gap:10px;padding:12px;background:var(--green-dim);
-  border:1px solid rgba(74,222,128,.3);border-radius:10px;margin-bottom:14px;font-size:12px;color:var(--green);}
-.ai-load.on{display:flex;}
-.spinner{width:16px;height:16px;border:2px solid var(--green-dim);border-top-color:var(--green);
-  border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
-@keyframes spin{to{transform:rotate(360deg)}}
+.ai-loading{display:none;align-items:center;gap:10px;padding:12px;background:var(--green-dim);
+  border:1px solid rgba(74,222,128,0.3);border-radius:10px;margin-bottom:14px;font-size:12px;color:var(--green);}
+.ai-loading.visible{display:flex;}
+.ai-spinner{width:16px;height:16px;border:2px solid var(--green-dim);border-top-color:var(--green);
+  border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
 .scroll-content{flex:1;overflow-y:auto;}
 ::-webkit-scrollbar{display:none;}
 </style>
@@ -200,7 +206,7 @@ input:checked+.tog-slider:before{transform:translateX(18px);background:var(--gre
   <div class="login-logo">tt.</div>
   <div class="login-sub">Time Tracker</div>
 
-  <button class="bio-btn" id="bioBtn" onclick="doBio()" style="display:none">
+  <button class="biometric-btn" id="bioBtn" onclick="doBiometric()" style="display:none">
     <div class="pulse-ring"></div>
     <svg class="bio-icon" viewBox="0 0 24 24">
       <path d="M12 2C8.5 2 5.5 3.8 3.8 6.5"/><path d="M20.2 6.5C18.5 3.8 15.5 2 12 2"/>
@@ -214,40 +220,47 @@ input:checked+.tog-slider:before{transform:translateX(18px);background:var(--gre
   </button>
   <div class="login-hint" id="bioHint" style="display:none">Face ID / Touch ID</div>
 
-  <!-- Password login (shown by default when pw exists) -->
-  <div class="login-form" id="pwForm" style="display:none">
+  <div id="pwForm" style="display:none">
     <input type="password" id="pwInput" placeholder="Password" autocomplete="current-password"
-      onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn-green" onclick="doLogin()">Unlock</button>
+      onkeydown="if(event.key==='Enter')doPassword()">
+    <button onclick="doPassword()">Unlock</button>
   </div>
 
-  <!-- First-time setup -->
-  <div class="login-form" id="setupForm">
-    <span class="setup-note">Welcome! Set a password to protect your time data.</span>
-    <input class="setup-input" type="password" id="setupPw1" placeholder="Choose a password">
-    <input class="setup-input" type="password" id="setupPw2" placeholder="Repeat password">
-    <button class="btn-green" onclick="doSetup()">Create Password &amp; Continue</button>
+  <div id="setupForm">
+    <div class="setup-note">Welcome! Set a password to protect your time data.</div>
+    <input type="password" id="setupPw1" placeholder="Choose a password">
+    <input type="password" id="setupPw2" placeholder="Repeat password">
+    <button onclick="doSetup()">Create Password &amp; Continue</button>
   </div>
 
-  <div class="login-err" id="loginErr"></div>
-  <span class="login-link" id="bioFallback" style="display:none" onclick="showPwForm()">Use password instead</span>
-  <span class="login-link" id="bioRegister" style="display:none" onclick="doRegisterBio()">Enable Face ID / Touch ID</span>
+  <div class="login-error" id="loginError"></div>
+  <span id="bioFallbackLink" style="display:none" class="login-fallback" onclick="showPwForm()">Use password instead</span>
+  <span id="bioRegisterLink" style="display:none" class="login-fallback" onclick="registerBiometricAndSave()">Enable Face ID / Touch ID</span>
 </div>
 
 <!-- APP -->
 <div id="appScreen" class="screen">
   <div class="topbar">
-    <button class="icon-btn" onclick="doLogout()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <button class="topbar-back" onclick="logout()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <div class="topbar-center">
       <div class="topbar-title">This Week</div>
       <div class="topbar-week" id="weekRange"></div>
     </div>
-    <button class="icon-btn" onclick="openSettings()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <button class="topbar-settings" onclick="openSettings()">
+      <svg class="settings-icon" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
+          a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+          A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83
+          l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+          A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+          l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+          a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83
+          l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+          a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </button>
   </div>
@@ -255,119 +268,133 @@ input:checked+.tog-slider:before{transform:translateX(18px);background:var(--gre
   <div class="scroll-content">
     <div class="weekly-card">
       <div class="hours-display">
-        <div class="hours-big" id="hoursDisplay">0:00</div>
+        <div class="hours-big" id="totalHoursDisplay">0:00</div>
         <div class="hours-label">HOURS THIS WEEK</div>
       </div>
-      <div class="prog-track"><div class="prog-bar" id="progBar"></div></div>
-      <div class="prog-labels">
-        <span>0h</span><span id="targetLbl">19h target</span><span id="maxLbl">20h max</span>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-labels">
+        <span>0h</span><span id="targetLabel">19h target</span><span id="maxLabel">20h max</span>
       </div>
-      <div class="status-msg" id="statusMsg"></div>
+      <div class="status-msg good" id="statusMsg"></div>
     </div>
 
     <div class="log-btn-wrap">
-      <button class="log-btn" onclick="openLog()">
-        <span style="font-size:20px;font-weight:300;line-height:1">+</span> Log a Day
+      <button class="log-btn" onclick="openLogModal()">
+        <span style="font-size:18px;font-weight:300">+</span> Log a Day
       </button>
     </div>
 
     <div class="section-label">HISTORY</div>
-    <div class="weeks-list" id="weeksList"></div>
+    <div class="weeks-list" id="weeksList">
+      <div class="empty-state">No entries yet.<br>Tap <em>Log a Day</em> to start.</div>
+    </div>
   </div>
 </div>
 
 <!-- LOG MODAL -->
-<div class="overlay hidden" id="logOverlay">
+<div class="modal-overlay hidden" id="logModal">
   <div class="modal">
-    <div class="modal-title" id="logTitle">Log a Day</div>
+    <div class="modal-title" id="modalTitle">Log a Day</div>
 
-    <button class="photo-btn" onclick="document.getElementById('photoInput').click()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <button class="photo-btn" onclick="triggerPhoto()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.5" stroke-linecap="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
       Upload timesheet photo
     </button>
     <input type="file" id="photoInput" accept="image/*" capture="environment" onchange="handlePhoto(event)">
-    <div class="ai-load" id="aiLoad"><div class="spinner"></div>AI is reading the times…</div>
+    <div class="ai-loading" id="aiLoading">
+      <div class="ai-spinner"></div>
+      AI is reading the times from your photo...
+    </div>
 
     <div class="field-group">
-      <label class="field-label">Date</label>
-      <input type="date" class="date-inp" id="entryDate">
+      <div class="field-label">Date</div>
+      <input type="date" class="date-input" id="entryDate">
     </div>
 
-    <div class="tog-row">
-      <label class="tog"><input type="checkbox" id="autoPause" onchange="onTogglePause()"><span class="tog-slider"></span></label>
-      <span class="tog-label">Auto 30-min break — enter only start &amp; end time</span>
+    <div class="toggle-row">
+      <label class="toggle">
+        <input type="checkbox" id="autoPause" onchange="togglePauseMode()">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">Auto 30-min break — enter only start &amp; end time</span>
     </div>
 
-    <!-- Manual: 4 fields -->
     <div id="manualFields">
       <div class="field-group">
-        <label class="field-label">Morning</label>
+        <div class="field-label">Morning</div>
         <div class="time-row">
-          <input type="time" class="time-inp" id="t1In">
-          <input type="time" class="time-inp" id="t1Out">
+          <input type="time" class="time-input" id="t1In">
+          <input type="time" class="time-input" id="t1Out">
         </div>
       </div>
       <div class="field-group">
-        <label class="field-label">Afternoon</label>
+        <div class="field-label">Afternoon</div>
         <div class="time-row">
-          <input type="time" class="time-inp" id="t2In">
-          <input type="time" class="time-inp" id="t2Out">
+          <input type="time" class="time-input" id="t2In">
+          <input type="time" class="time-input" id="t2Out">
         </div>
       </div>
     </div>
 
-    <!-- Auto: 2 fields -->
     <div id="autoFields" style="display:none">
       <div class="field-group">
-        <label class="field-label">Start → End of day</label>
+        <div class="field-label">Start &rarr; End of day</div>
         <div class="time-row">
-          <input type="time" class="time-inp" id="dayStart">
-          <input type="time" class="time-inp" id="dayEnd">
+          <input type="time" class="time-input" id="dayStart">
+          <input type="time" class="time-input" id="dayEnd">
         </div>
       </div>
     </div>
 
-    <div class="tog-row">
-      <label class="tog"><input type="checkbox" id="isHO"><span class="tog-slider"></span></label>
-      <span class="tog-label">Home Office</span>
+    <div class="ho-row">
+      <label class="toggle">
+        <input type="checkbox" id="isHomeoffice">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="ho-label">Home Office</span>
     </div>
 
-    <div class="preview-hrs" id="previewHrs"></div>
-    <div class="form-err" id="formErr"></div>
+    <div class="preview-hours" id="previewHours"></div>
+    <div class="form-error" id="formError"></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeLog()">Cancel</button>
-      <button class="btn-save" onclick="saveEntry()">Save</button>
+      <button class="modal-cancel" onclick="closeLogModal()">Cancel</button>
+      <button class="modal-save" onclick="saveEntry()">Save</button>
     </div>
   </div>
 </div>
 
 <!-- SETTINGS MODAL -->
-<div class="overlay hidden" id="settOverlay">
+<div class="modal-overlay hidden" id="settingsModal">
   <div class="modal">
     <div class="modal-title">Settings</div>
-    <div class="sett-section">
-      <div class="sett-section-title">Working Hours</div>
-      <div class="sett-row">
-        <div><div class="sett-row-label">Target (min. hours)</div><div class="sett-row-sub">Green zone up to this</div></div>
-        <input type="number" class="sett-inp" id="settTarget" min="1" max="60" value="19">
+    <div class="settings-section">
+      <div class="settings-section-title">Working Hours</div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Target (min. hours)</div><div class="settings-row-sub">Green zone up to this</div></div>
+        <input type="number" class="settings-input" id="settingTarget" min="1" max="60" value="19">
       </div>
-      <div class="sett-row">
-        <div><div class="sett-row-label">Maximum (max. hours)</div><div class="sett-row-sub">Warning above this</div></div>
-        <input type="number" class="sett-inp" id="settMax" min="1" max="60" value="20">
+      <div class="settings-row">
+        <div><div class="settings-row-label">Maximum (max. hours)</div><div class="settings-row-sub">Warning above this</div></div>
+        <input type="number" class="settings-input" id="settingMax" min="1" max="60" value="20">
       </div>
     </div>
-    <div class="sett-section">
-      <div class="sett-section-title">Change Password</div>
-      <input type="password" class="sett-pw-inp" id="newPw" placeholder="New password">
-      <input type="password" class="sett-pw-inp" id="newPw2" placeholder="Repeat new password">
-      <div class="form-err" id="settErr"></div>
+    <div class="settings-section">
+      <div class="settings-section-title">Change Password</div>
+      <div class="field-group">
+        <input type="password" class="date-input" id="newPassword"
+          placeholder="New password" style="margin-bottom:8px">
+        <input type="password" class="date-input" id="newPasswordConfirm"
+          placeholder="Repeat new password">
+      </div>
+      <div class="form-error" id="pwChangeError"></div>
     </div>
-    <button class="btn-save" style="width:100%;padding:16px;margin-top:4px" onclick="saveSettings()">Save</button>
+    <button class="settings-save" onclick="saveSettings()">Save</button>
     <div class="modal-actions" style="margin-top:10px">
-      <button class="btn-cancel" style="flex:1" onclick="closeSettings()">Close</button>
+      <button class="modal-cancel" onclick="closeSettings()">Close</button>
     </div>
   </div>
 </div>
@@ -377,71 +404,59 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// ─── KEYS ───────────────────────────────────────────
-const K_PW='tt_pw', K_BIO='tt_bio', K_SESS='tt_sess', K_SETT='tt_sett', K_TOKEN='tt_tok';
-let db, editId=null, cfg={target:19,max:20};
+const PW_KEY='tt_pw_hash', BIO_KEY='tt_bio', SESSION_KEY='tt_session';
+const SETTINGS_KEY='tt_settings', TOKEN_KEY='tt_token', BIO_TOKEN_KEY='tt_bio_token';
+let db=null, editingId=null, settings={target:19,max:20};
 
-// ─── CRYPTO ─────────────────────────────────────────
-async function h256(s){
+async function sha256(s){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
-async function mkToken(pw){ return (await h256(await h256(pw)+'tt1')).slice(0,32); }
-const tok=()=>sessionStorage.getItem(K_TOKEN)||'';
+async function deriveToken(pw){
+  const h=await sha256(pw);
+  return (await sha256(h+'tt_salt_v1')).slice(0,32);
+}
+const getToken=()=>sessionStorage.getItem(TOKEN_KEY)||'';
 
-// ─── FIREBASE ───────────────────────────────────────
-(function(){
-  db=getFirestore(initializeApp({
-    apiKey:"AIzaSyAZGNx1E4ITYoouLots3yxoClWJb3Hrp4Q",
-    authDomain:"timetrack-89a88.firebaseapp.com",
-    projectId:"timetrack-89a88",
-    storageBucket:"timetrack-89a88.firebasestorage.app",
-    messagingSenderId:"794920185816",
-    appId:"1:794920185816:web:84909a0d608d0238fa0cad"
-  }));
-})();
-
-// ─── SETTINGS ───────────────────────────────────────
-function loadCfg(){
-  const s=localStorage.getItem(K_SETT);
-  if(s)cfg=JSON.parse(s);
-  document.getElementById('settTarget').value=cfg.target;
-  document.getElementById('settMax').value=cfg.max;
-  document.getElementById('targetLbl').textContent=cfg.target+'h target';
-  document.getElementById('maxLbl').textContent=cfg.max+'h max';
+function loadSettings(){
+  const s=localStorage.getItem(SETTINGS_KEY);
+  if(s)settings=JSON.parse(s);
+  document.getElementById('settingTarget').value=settings.target;
+  document.getElementById('settingMax').value=settings.max;
+  document.getElementById('targetLabel').textContent=settings.target+'h target';
+  document.getElementById('maxLabel').textContent=settings.max+'h max';
 }
 window.openSettings=()=>{
-  document.getElementById('settTarget').value=cfg.target;
-  document.getElementById('settMax').value=cfg.max;
-  document.getElementById('settErr').textContent='';
-  document.getElementById('newPw').value='';
-  document.getElementById('newPw2').value='';
-  document.getElementById('settOverlay').classList.remove('hidden');
+  document.getElementById('settingTarget').value=settings.target;
+  document.getElementById('settingMax').value=settings.max;
+  document.getElementById('pwChangeError').textContent='';
+  document.getElementById('newPassword').value='';
+  document.getElementById('newPasswordConfirm').value='';
+  document.getElementById('settingsModal').classList.remove('hidden');
 };
-window.closeSettings=()=>document.getElementById('settOverlay').classList.add('hidden');
+window.closeSettings=()=>document.getElementById('settingsModal').classList.add('hidden');
 window.saveSettings=async()=>{
-  const t=parseInt(document.getElementById('settTarget').value);
-  const m=parseInt(document.getElementById('settMax').value);
-  const e=document.getElementById('settErr');
-  if(isNaN(t)||isNaN(m)||t<1||m<=t){e.textContent='Target must be less than maximum.';return;}
-  cfg={target:t,max:m};
-  localStorage.setItem(K_SETT,JSON.stringify(cfg));
-  document.getElementById('targetLbl').textContent=t+'h target';
-  document.getElementById('maxLbl').textContent=m+'h max';
-  const p1=document.getElementById('newPw').value;
-  const p2=document.getElementById('newPw2').value;
-  if(p1){
-    if(p1!==p2){e.textContent="Passwords don't match.";return;}
-    localStorage.setItem(K_PW,await h256(p1));
-    const nt=await mkToken(p1);
-    sessionStorage.setItem(K_TOKEN,nt);
-    localStorage.setItem(K_TOKEN,nt);
+  const t=parseInt(document.getElementById('settingTarget').value);
+  const m=parseInt(document.getElementById('settingMax').value);
+  const el=document.getElementById('pwChangeError');
+  if(isNaN(t)||isNaN(m)||t<1||m<1||t>=m){el.textContent='Target must be less than maximum.';return;}
+  settings={target:t,max:m};
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  document.getElementById('targetLabel').textContent=t+'h target';
+  document.getElementById('maxLabel').textContent=m+'h max';
+  const np=document.getElementById('newPassword').value;
+  const nc=document.getElementById('newPasswordConfirm').value;
+  if(np){
+    if(np!==nc){el.textContent="Passwords don't match.";return;}
+    localStorage.setItem(PW_KEY,await sha256(np));
+    const tok=await deriveToken(np);
+    sessionStorage.setItem(TOKEN_KEY,tok);
+    localStorage.setItem(BIO_TOKEN_KEY,tok);
   }
-  closeSettings(); loadWeek();
+  closeSettings();loadWeek();
 };
 
-// ─── UTILS ──────────────────────────────────────────
-function weekBounds(d){
+function getWeekStart(d){
   const n=d||new Date(),day=n.getDay(),m=new Date(n);
   m.setDate(n.getDate()-(day===0?6:day-1));m.setHours(0,0,0,0);
   return m.toISOString().split('T')[0];
@@ -452,266 +467,296 @@ function fmtDate(ds){
 function fmtRange(wk){
   const m=new Date(wk+'T00:00:00'),s=new Date(m);s.setDate(m.getDate()+6);
   const f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-  return f(m)+' – '+f(s);
+  return f(m)+' \u2013 '+f(s);
 }
 function t2m(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
 function m2hm(min){const h=Math.floor(Math.abs(min)/60),m=Math.abs(min)%60;return`${h}:${String(m).padStart(2,'0')}`;}
-function calcMin(e){
-  if(e.auto&&e.s&&e.en){const t=t2m(e.en)-t2m(e.s)-30;return t>0?t:0;}
-  const a=t2m(e.t1i),b=t2m(e.t1o);if(a===null||b===null)return 0;
-  let tot=b-a;if(e.t2i&&e.t2o)tot+=t2m(e.t2o)-t2m(e.t2i);return tot>0?tot:0;
+function calcMinutes(e){
+  if(e.autoPause&&e.dayStart&&e.dayEnd){const t=t2m(e.dayEnd)-t2m(e.dayStart)-30;return t>0?t:0;}
+  const a=t2m(e.t1In),b=t2m(e.t1Out);if(a===null||b===null)return 0;
+  let tot=b-a;if(e.t2In&&e.t2Out)tot+=t2m(e.t2Out)-t2m(e.t2In);return tot>0?tot:0;
 }
 
-// ─── BIOMETRIC ──────────────────────────────────────
-window.doRegisterBio=async()=>{
+(function initFirebase(){
+  db=getFirestore(initializeApp({
+    apiKey:"AIzaSyAZGNx1E4ITYoouLots3yxoClWJb3Hrp4Q",
+    authDomain:"timetrack-89a88.firebaseapp.com",
+    projectId:"timetrack-89a88",
+    storageBucket:"timetrack-89a88.firebasestorage.app",
+    messagingSenderId:"794920185816",
+    appId:"1:794920185816:web:84909a0d608d0238fa0cad"
+  }));
+})();
+
+window.registerBiometricAndSave=async()=>{
   try{
-    const c=await navigator.credentials.create({publicKey:{
+    const cred=await navigator.credentials.create({publicKey:{
       challenge:crypto.getRandomValues(new Uint8Array(32)),
-      rp:{name:'TimeTrack'},user:{id:new Uint8Array([1]),name:'u',displayName:'User'},
+      rp:{name:'TimeTrack'},user:{id:new Uint8Array([1]),name:'user',displayName:'User'},
       pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
       authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000
     }});
-    localStorage.setItem(K_BIO,JSON.stringify({id:c.id,raw:btoa(String.fromCharCode(...new Uint8Array(c.rawId)))}));
-    document.getElementById('bioRegister').textContent='✓ Face ID / Touch ID enabled';
-  }catch(e){alert('Could not enable biometrics.');}
+    localStorage.setItem(BIO_KEY,JSON.stringify({
+      id:cred.id,rawId:btoa(String.fromCharCode(...new Uint8Array(cred.rawId)))
+    }));
+    document.getElementById('bioRegisterLink').textContent='✓ Face ID / Touch ID enabled';
+  }catch(e){alert('Could not enable biometrics on this device.');}
 };
-window.doBio=async()=>{
-  document.getElementById('loginErr').textContent='';
-  document.getElementById('bioBtn').style.opacity='.5';
+
+window.doBiometric=async()=>{
+  document.getElementById('loginError').textContent='';
+  document.getElementById('bioBtn').style.opacity='0.5';
   try{
-    const s=JSON.parse(localStorage.getItem(K_BIO)||'null');
-    if(!s){showPwForm();return;}
+    const stored=JSON.parse(localStorage.getItem(BIO_KEY)||'null');
+    if(!stored){showPwForm();return;}
     await navigator.credentials.get({publicKey:{
       challenge:crypto.getRandomValues(new Uint8Array(32)),
-      allowCredentials:[{type:'public-key',id:Uint8Array.from(atob(s.raw),c=>c.charCodeAt(0))}],
+      allowCredentials:[{type:'public-key',id:Uint8Array.from(atob(stored.rawId),c=>c.charCodeAt(0))}],
       userVerification:'required',timeout:60000
     }});
-    const t=localStorage.getItem(K_TOKEN);
-    if(!t){showPwForm();}else{sessionStorage.setItem(K_TOKEN,t);unlock();}
-  }catch(e){document.getElementById('loginErr').textContent='Authentication failed.';}
+    const tok=localStorage.getItem(BIO_TOKEN_KEY);
+    if(!tok){document.getElementById('loginError').textContent='Please log in with password once first.';showPwForm();}
+    else{sessionStorage.setItem(TOKEN_KEY,tok);unlockApp();}
+  }catch(e){document.getElementById('loginError').textContent='Authentication failed.';}
   document.getElementById('bioBtn').style.opacity='1';
 };
+
 window.showPwForm=()=>{
   document.getElementById('bioBtn').style.display='none';
   document.getElementById('bioHint').style.display='none';
-  document.getElementById('bioFallback').style.display='none';
+  document.getElementById('bioFallbackLink').style.display='none';
   document.getElementById('pwForm').style.display='flex';
 };
 
-// ─── AUTH ────────────────────────────────────────────
 window.doSetup=async()=>{
   const p1=document.getElementById('setupPw1').value;
   const p2=document.getElementById('setupPw2').value;
-  const e=document.getElementById('loginErr');
-  if(!p1){e.textContent='Please enter a password.';return;}
-  if(p1!==p2){e.textContent="Passwords don't match.";return;}
-  localStorage.setItem(K_PW,await h256(p1));
-  const t=await mkToken(p1);
-  sessionStorage.setItem(K_TOKEN,t);
-  localStorage.setItem(K_TOKEN,t);
-  unlock(true);
+  const err=document.getElementById('loginError');
+  if(!p1){err.textContent='Please enter a password.';return;}
+  if(p1!==p2){err.textContent="Passwords don't match.";return;}
+  localStorage.setItem(PW_KEY,await sha256(p1));
+  const tok=await deriveToken(p1);
+  sessionStorage.setItem(TOKEN_KEY,tok);
+  localStorage.setItem(BIO_TOKEN_KEY,tok);
+  unlockApp(true);
 };
-window.doLogin=async()=>{
-  const pw=document.getElementById('pwInput').value;
-  if(await h256(pw)!==localStorage.getItem(K_PW)){
-    document.getElementById('loginErr').textContent='Incorrect password.';return;
-  }
-  const t=await mkToken(pw);
-  sessionStorage.setItem(K_TOKEN,t);
-  localStorage.setItem(K_TOKEN,t);
-  unlock(false);
-};
-function unlock(first=false){
-  sessionStorage.setItem(K_SESS,'1');
-  show('appScreen');loadWeek();
-  if(first&&window.PublicKeyCredential)
-    document.getElementById('bioRegister').style.display='block';
-}
-window.doLogout=()=>{
-  sessionStorage.removeItem(K_SESS);sessionStorage.removeItem(K_TOKEN);show('loginScreen');
-};
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-// ─── LOAD DATA ───────────────────────────────────────
+window.doPassword=async()=>{
+  const pw=document.getElementById('pwInput').value;
+  if(await sha256(pw)!==localStorage.getItem(PW_KEY)){
+    document.getElementById('loginError').textContent='Incorrect password.';return;
+  }
+  const tok=await deriveToken(pw);
+  sessionStorage.setItem(TOKEN_KEY,tok);
+  localStorage.setItem(BIO_TOKEN_KEY,tok);
+  unlockApp(false);
+};
+
+function unlockApp(firstTime=false){
+  sessionStorage.setItem(SESSION_KEY,'1');
+  showScreen('appScreen');loadWeek();
+  if(firstTime&&window.PublicKeyCredential)
+    document.getElementById('bioRegisterLink').style.display='block';
+}
+window.logout=()=>{
+  sessionStorage.removeItem(SESSION_KEY);sessionStorage.removeItem(TOKEN_KEY);showScreen('loginScreen');
+};
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
 async function loadWeek(){
-  loadCfg();
-  const thisWk=weekBounds();
+  loadSettings();
+  const thisWk=getWeekStart();
+  const mon=new Date(thisWk+'T00:00:00'),sun=new Date(mon);sun.setDate(mon.getDate()+6);
   document.getElementById('weekRange').textContent=fmtRange(thisWk);
+  const myTok=getToken();
   let all=[];
   try{
-    // fetch all entries then filter client-side by token — avoids needing a Firestore index
+    // fetch all, filter client-side — no index needed
     const snap=await getDocs(collection(db,'entries'));
-    const myTok=tok();
     snap.forEach(d=>{const dd=d.data();if(dd.token===myTok)all.push({id:d.id,...dd});});
   }catch(e){console.error(e);}
-  const totalMin=all.filter(e=>e.wk===thisWk).reduce((s,e)=>s+calcMin(e),0);
+  const totalMin=all.filter(e=>e.weekStart===thisWk).reduce((s,e)=>s+calcMinutes(e),0);
   updateSummary(totalMin);
   const weeks={};
-  all.forEach(e=>{if(!weeks[e.wk])weeks[e.wk]=[];weeks[e.wk].push(e);});
-  renderHistory(Object.keys(weeks).sort((a,b)=>b.localeCompare(a)),weeks,thisWk);
+  all.forEach(e=>{if(!weeks[e.weekStart])weeks[e.weekStart]=[];weeks[e.weekStart].push(e);});
+  renderAccordion(Object.keys(weeks).sort((a,b)=>b.localeCompare(a)),weeks,thisWk);
 }
 
 function updateSummary(totalMin){
-  const d=document.getElementById('hoursDisplay');
-  const b=document.getElementById('progBar');
-  const m=document.getElementById('statusMsg');
-  const target=cfg.target*60,max=cfg.max*60;
-  d.textContent=m2hm(totalMin);
-  b.style.width=Math.min((totalMin/max)*100,100)+'%';
-  d.className='hours-big';b.className='prog-bar';m.className='status-msg';
+  const disp=document.getElementById('totalHoursDisplay');
+  const bar=document.getElementById('progressBar');
+  const msg=document.getElementById('statusMsg');
+  const target=settings.target*60,max=settings.max*60;
+  disp.textContent=m2hm(totalMin);
+  bar.style.width=Math.min((totalMin/max)*100,100)+'%';
+  disp.className='hours-big';bar.className='progress-bar';msg.className='status-msg';
   if(totalMin<target){
-    m.textContent=`${m2hm(target-totalMin)} more to reach ${cfg.target}h target`;m.classList.add('good');
+    msg.textContent=`${m2hm(target-totalMin)} more to reach ${settings.target}h target`;msg.classList.add('good');
   }else if(totalMin<=max){
-    m.textContent=`✓ Target reached! ${m2hm(max-totalMin)} buffer before ${cfg.max}h cap`;
-    m.classList.add('warn');d.classList.add('warn');b.classList.add('warn');
+    msg.textContent=`\u2713 Target reached! ${m2hm(max-totalMin)} buffer before ${settings.max}h cap`;
+    msg.classList.add('warn');disp.classList.add('warn');bar.classList.add('warn');
   }else{
-    m.textContent=`⚠ ${m2hm(totalMin-max)} over the ${cfg.max}h limit`;
-    m.classList.add('danger');d.classList.add('danger');b.classList.add('danger');
+    msg.textContent=`\u26a0 ${m2hm(totalMin-max)} over the ${settings.max}h limit`;
+    msg.classList.add('danger');disp.classList.add('danger');bar.classList.add('danger');
   }
 }
 
-function renderHistory(keys,weeks,thisWk){
+function renderAccordion(keys,weeks,thisWk){
   const list=document.getElementById('weeksList');
   if(!keys.length){list.innerHTML='<div class="empty-state">No entries yet.<br>Tap <em>Log a Day</em> to start.</div>';return;}
   list.innerHTML='';
   keys.forEach(wk=>{
     const entries=weeks[wk].sort((a,b)=>b.date.localeCompare(a.date));
-    const total=entries.reduce((s,e)=>s+calcMin(e),0);
-    const tc=total>=cfg.max*60?'danger':total>=cfg.target*60?'warn':'';
+    const total=entries.reduce((s,e)=>s+calcMinutes(e),0);
     const isThis=wk===thisWk;
+    const tc=total>=settings.max*60?'danger':total>=settings.target*60?'warn':'';
     const acc=document.createElement('div');
-    acc.className='week-acc'+(isThis?' open':'');
+    acc.className='week-accordion'+(isThis?' open':'');
     acc.innerHTML=`
-      <div class="week-acc-hdr" onclick="this.closest('.week-acc').classList.toggle('open')">
-        <div class="wah-left">
-          <div class="wah-range">${fmtRange(wk)}</div>
-          <div class="wah-sub">${isThis?'THIS WEEK':entries.length+' DAY'+(entries.length!==1?'S':'')}</div>
+      <div class="week-accordion-header" onclick="this.closest('.week-accordion').classList.toggle('open')">
+        <div class="week-acc-left">
+          <div class="week-acc-range">${fmtRange(wk)}</div>
+          <div class="week-acc-sub">${isThis?'THIS WEEK':entries.length+' DAY'+(entries.length!==1?'S':'')}</div>
         </div>
-        <div class="wah-right">
-          <div class="wah-total ${tc}">${m2hm(total)}h</div>
-          <svg class="wah-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="week-acc-right">
+          <div class="week-acc-total ${tc}">${m2hm(total)}h</div>
+          <svg class="week-acc-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
-      <div class="week-acc-body">${entries.map(dayCard).join('')}</div>`;
+      <div class="week-accordion-body">${entries.map(renderDayCard).join('')}</div>`;
     list.appendChild(acc);
   });
 }
 
-function dayCard(e){
-  const min=calcMin(e);
+function renderDayCard(e){
+  const min=calcMinutes(e);
   let times='';
-  if(e.auto&&e.s){
-    times=`<div class="dc-row">Start <span>${e.s}</span></div>
-           <div class="dc-row">Break <span>30 min (auto)</span></div>
-           <div class="dc-row">End <span>${e.en}</span></div>`;
+  if(e.autoPause&&e.dayStart){
+    times=`<div class="day-time-row">Start <span>${e.dayStart}</span></div>
+           <div class="day-time-row">Break <span>30 min (auto)</span></div>
+           <div class="day-time-row">End <span>${e.dayEnd}</span></div>`;
   }else{
-    if(e.t1i)times+=`<div class="dc-row">Morning <span>${e.t1i} → ${e.t1o}</span></div>`;
-    if(e.t2i)times+=`<div class="dc-row">Afternoon <span>${e.t2i} → ${e.t2o}</span></div>`;
+    if(e.t1In)times+=`<div class="day-time-row">Morning <span>${e.t1In} \u2192 ${e.t1Out}</span></div>`;
+    if(e.t2In)times+=`<div class="day-time-row">Afternoon <span>${e.t2In} \u2192 ${e.t2Out}</span></div>`;
   }
   return`<div class="day-card">
-    <div class="dc-hdr">
-      <div class="dc-date">${fmtDate(e.date)}</div>
-      <div class="dc-badges">${e.ho?'<span class="badge-ho">HO</span>':''}<div class="dc-total">${m2hm(min)}h</div></div>
+    <div class="day-card-header">
+      <div class="day-date">${fmtDate(e.date)}</div>
+      <div class="day-badges">${e.homeoffice?'<span class="badge-ho">HO</span>':''}<div class="day-total">${m2hm(min)}h</div></div>
     </div>
-    <div class="dc-times">${times}</div>
-    <div class="dc-actions">
-      <button class="dc-btn" onclick="openEdit('${e.id}')">Edit</button>
-      <button class="dc-btn del" onclick="delEntry('${e.id}')">Delete</button>
+    <div class="day-times">${times}</div>
+    <div class="day-card-actions">
+      <button class="day-action-btn" onclick="openEdit('${e.id}')">Edit</button>
+      <button class="day-action-btn del" onclick="deleteEntry('${e.id}')">Delete</button>
     </div>
   </div>`;
 }
 
-// ─── LOG MODAL ───────────────────────────────────────
-window.openLog=()=>{
-  editId=null;
-  document.getElementById('logTitle').textContent='Log a Day';
+window.openLogModal=()=>{
+  editingId=null;
+  document.getElementById('modalTitle').textContent='Log a Day';
   document.getElementById('entryDate').value=new Date().toISOString().split('T')[0];
   ['t1In','t1Out','t2In','t2Out','dayStart','dayEnd'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('autoPause').checked=false;
-  document.getElementById('isHO').checked=false;
+  document.getElementById('isHomeoffice').checked=false;
   document.getElementById('manualFields').style.display='block';
   document.getElementById('autoFields').style.display='none';
-  document.getElementById('previewHrs').textContent='';
-  document.getElementById('formErr').textContent='';
-  document.getElementById('aiLoad').classList.remove('on');
-  document.getElementById('logOverlay').classList.remove('hidden');
+  document.getElementById('previewHours').textContent='';
+  document.getElementById('formError').textContent='';
+  document.getElementById('aiLoading').classList.remove('visible');
+  document.getElementById('logModal').classList.remove('hidden');
 };
+
 window.openEdit=async id=>{
   const snap=await getDocs(collection(db,'entries'));
+  const myTok=getToken();
   let entry;
-  const myTok=tok();
   snap.forEach(d=>{const dd=d.data();if(d.id===id&&dd.token===myTok)entry={id:d.id,...dd};});
   if(!entry)return;
-  editId=id;
-  document.getElementById('logTitle').textContent='Edit Entry';
+  editingId=id;
+  document.getElementById('modalTitle').textContent='Edit Entry';
   document.getElementById('entryDate').value=entry.date;
-  document.getElementById('autoPause').checked=!!entry.auto;
-  document.getElementById('isHO').checked=!!entry.ho;
-  document.getElementById('t1In').value=entry.t1i||'';
-  document.getElementById('t1Out').value=entry.t1o||'';
-  document.getElementById('t2In').value=entry.t2i||'';
-  document.getElementById('t2Out').value=entry.t2o||'';
-  document.getElementById('dayStart').value=entry.s||'';
-  document.getElementById('dayEnd').value=entry.en||'';
-  document.getElementById('manualFields').style.display=entry.auto?'none':'block';
-  document.getElementById('autoFields').style.display=entry.auto?'block':'none';
-  document.getElementById('previewHrs').textContent='';
-  document.getElementById('formErr').textContent='';
-  document.getElementById('aiLoad').classList.remove('on');
-  document.getElementById('logOverlay').classList.remove('hidden');
+  document.getElementById('autoPause').checked=!!entry.autoPause;
+  document.getElementById('isHomeoffice').checked=!!entry.homeoffice;
+  document.getElementById('t1In').value=entry.t1In||'';
+  document.getElementById('t1Out').value=entry.t1Out||'';
+  document.getElementById('t2In').value=entry.t2In||'';
+  document.getElementById('t2Out').value=entry.t2Out||'';
+  document.getElementById('dayStart').value=entry.dayStart||'';
+  document.getElementById('dayEnd').value=entry.dayEnd||'';
+  document.getElementById('manualFields').style.display=entry.autoPause?'none':'block';
+  document.getElementById('autoFields').style.display=entry.autoPause?'block':'none';
+  document.getElementById('previewHours').textContent='';
+  document.getElementById('formError').textContent='';
+  document.getElementById('aiLoading').classList.remove('visible');
+  document.getElementById('logModal').classList.remove('hidden');
 };
-window.closeLog=()=>document.getElementById('logOverlay').classList.add('hidden');
-window.onTogglePause=()=>{
+
+window.closeLogModal=()=>document.getElementById('logModal').classList.add('hidden');
+
+window.togglePauseMode=()=>{
   const a=document.getElementById('autoPause').checked;
   document.getElementById('manualFields').style.display=a?'none':'block';
   document.getElementById('autoFields').style.display=a?'block':'none';
-  updPreview();
+  updatePreview();
 };
+
 ['t1In','t1Out','t2In','t2Out','dayStart','dayEnd'].forEach(id=>
-  document.getElementById(id)?.addEventListener('change',updPreview));
-function getForm(){
+  document.getElementById(id)?.addEventListener('change',updatePreview));
+
+function getFormEntry(){
   const a=document.getElementById('autoPause').checked;
-  return{date:document.getElementById('entryDate').value,auto:a,
-    t1i:a?'':document.getElementById('t1In').value,
-    t1o:a?'':document.getElementById('t1Out').value,
-    t2i:a?'':document.getElementById('t2In').value,
-    t2o:a?'':document.getElementById('t2Out').value,
-    s:a?document.getElementById('dayStart').value:'',
-    en:a?document.getElementById('dayEnd').value:'',
-    ho:document.getElementById('isHO').checked};
+  return{date:document.getElementById('entryDate').value,autoPause:a,
+    t1In:a?'':document.getElementById('t1In').value,
+    t1Out:a?'':document.getElementById('t1Out').value,
+    t2In:a?'':document.getElementById('t2In').value,
+    t2Out:a?'':document.getElementById('t2Out').value,
+    dayStart:a?document.getElementById('dayStart').value:'',
+    dayEnd:a?document.getElementById('dayEnd').value:'',
+    homeoffice:document.getElementById('isHomeoffice').checked};
 }
-function updPreview(){
-  const min=calcMin(getForm());
-  document.getElementById('previewHrs').textContent=min>0?`= ${m2hm(min)} hours`:'';
+function updatePreview(){
+  const min=calcMinutes(getFormEntry());
+  document.getElementById('previewHours').textContent=min>0?`= ${m2hm(min)} hours`:'';
 }
+
 window.saveEntry=async()=>{
-  const entry=getForm(),e=document.getElementById('formErr');
-  e.textContent='';
-  if(!entry.date){e.textContent='Please select a date.';return;}
-  if(entry.auto){
-    if(!entry.s||!entry.en){e.textContent='Please enter start and end time.';return;}
-    if(t2m(entry.en)<=t2m(entry.s)+30){e.textContent='Need at least 30 min gap for auto break.';return;}
+  const entry=getFormEntry(),err=document.getElementById('formError');
+  err.textContent='';
+  if(!entry.date){err.textContent='Please select a date.';return;}
+  if(entry.autoPause){
+    if(!entry.dayStart||!entry.dayEnd){err.textContent='Please enter start and end time.';return;}
+    if(t2m(entry.dayEnd)<=t2m(entry.dayStart)+30){err.textContent='Need at least 30 min gap for auto break.';return;}
   }else{
-    if(!entry.t1i||!entry.t1o){e.textContent='Please fill in morning times.';return;}
-    if(t2m(entry.t1o)<=t2m(entry.t1i)){e.textContent='End must be after start.';return;}
-    if(entry.t2i&&entry.t2o&&t2m(entry.t2o)<=t2m(entry.t2i)){e.textContent='Afternoon end must be after start.';return;}
+    if(!entry.t1In||!entry.t1Out){err.textContent='Please fill in morning times.';return;}
+    if(t2m(entry.t1Out)<=t2m(entry.t1In)){err.textContent='End must be after start.';return;}
+    if(entry.t2In&&entry.t2Out&&t2m(entry.t2Out)<=t2m(entry.t2In)){err.textContent='Afternoon end must be after start.';return;}
   }
   try{
-    if(editId)await deleteDoc(doc(db,'entries',editId));
-    await addDoc(collection(db,'entries'),{...entry,wk:weekBounds(new Date(entry.date+'T12:00:00')),token:tok(),ts:Date.now()});
-    closeLog();loadWeek();
-  }catch(err){e.textContent='Save failed: '+err.message;console.error(err);}
+    if(editingId)await deleteDoc(doc(db,'entries',editingId));
+    await addDoc(collection(db,'entries'),{
+      ...entry,
+      weekStart:getWeekStart(new Date(entry.date+'T12:00:00')),
+      token:getToken(),
+      updatedAt:Date.now()
+    });
+    closeLogModal();loadWeek();
+  }catch(e){err.textContent='Save failed: '+e.message;console.error(e);}
 };
-window.delEntry=async id=>{
+
+window.deleteEntry=async id=>{
   if(!confirm('Delete this entry?'))return;
   await deleteDoc(doc(db,'entries',id));loadWeek();
 };
 
-// ─── PHOTO / AI ──────────────────────────────────────
+window.triggerPhoto=()=>document.getElementById('photoInput').click();
 window.handlePhoto=async ev=>{
   const file=ev.target.files[0];if(!file)return;
-  document.getElementById('aiLoad').classList.add('on');
-  document.getElementById('formErr').textContent='';
+  document.getElementById('aiLoading').classList.add('visible');
+  document.getElementById('formError').textContent='';
   try{
     const b64=await new Promise((res,rej)=>{
       const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);
@@ -734,21 +779,20 @@ window.handlePhoto=async ev=>{
     document.getElementById('autoPause').checked=false;
     document.getElementById('manualFields').style.display='block';
     document.getElementById('autoFields').style.display='none';
-    updPreview();
+    updatePreview();
   }catch(e){
-    document.getElementById('formErr').textContent="AI couldn't read the times. Please enter manually.";
+    document.getElementById('formError').textContent="AI couldn't read the times. Please enter manually.";
   }
-  document.getElementById('aiLoad').classList.remove('on');
+  document.getElementById('aiLoading').classList.remove('visible');
   ev.target.value='';
 };
 
-// ─── INIT ────────────────────────────────────────────
 (function init(){
-  loadCfg();
-  if(sessionStorage.getItem(K_SESS)){unlock();return;}
-  show('loginScreen');
-  const hasPw=!!localStorage.getItem(K_PW);
-  const hasBio=!!localStorage.getItem(K_BIO);
+  loadSettings();
+  if(sessionStorage.getItem(SESSION_KEY)){unlockApp();return;}
+  showScreen('loginScreen');
+  const hasPw=!!localStorage.getItem(PW_KEY);
+  const hasBio=!!localStorage.getItem(BIO_KEY);
   if(!hasPw){
     document.getElementById('setupForm').style.display='flex';
     return;
@@ -757,8 +801,8 @@ window.handlePhoto=async ev=>{
   if(hasBio&&window.PublicKeyCredential){
     document.getElementById('bioBtn').style.display='flex';
     document.getElementById('bioHint').style.display='block';
-    document.getElementById('bioFallback').style.display='block';
-    setTimeout(doBio,400);
+    document.getElementById('bioFallbackLink').style.display='block';
+    setTimeout(doBiometric,400);
   }else{
     document.getElementById('pwForm').style.display='flex';
   }
