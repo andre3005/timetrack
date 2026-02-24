@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TimeTrack">
+<title>TimeTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --surface: #181819;
+    --surface2: #222224;
+    --border: #2a2a2d;
+    --text: #f0ede8;
+    --muted: #6b6b70;
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.12);
+    --amber: #fbbf24;
+    --red: #f87171;
+    --accent: #e8e0d5;
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ─── LOGIN ─── */
+  #loginScreen {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: radial-gradient(ellipse at 50% 0%, #1a2a1a 0%, var(--bg) 60%);
+  }
+
+  .login-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    color: var(--green);
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+  }
+
+  .login-sub {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 64px;
+  }
+
+  .biometric-btn {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    border: 2px solid var(--green);
+    background: var(--green-dim);
+    color: var(--green);
+    font-size: 36px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .biometric-btn:active { transform: scale(0.94); background: rgba(74,222,128,0.25); }
+
+  .biometric-btn .pulse-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--green);
+    opacity: 0;
+    animation: pulse-out 2.4s ease-out infinite;
+  }
+
+  @keyframes pulse-out {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.4); }
+  }
+
+  .login-hint { color: var(--muted); font-size: 12px; text-align: center; }
+  .login-fallback { margin-top: 32px; color: var(--muted); font-size: 11px; cursor: pointer; text-decoration: underline; }
+
+  /* password fallback */
+  #pwFallback { display: none; flex-direction: column; align-items: center; gap: 12px; margin-top: 32px; width: 100%; max-width: 280px; }
+  #pwFallback input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+  #pwFallback button {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+
+  .login-error { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 18px; }
+
+  /* ─── FIREBASE SETUP MODAL ─── */
+  #setupModal {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    padding: 48px 24px 32px;
+    overflow-y: auto;
+  }
+
+  #setupModal.hidden { display: none; }
+
+  .setup-title { font-family: 'Instrument Serif', serif; font-size: 28px; color: var(--green); margin-bottom: 8px; }
+  .setup-desc { color: var(--muted); font-size: 12px; line-height: 1.8; margin-bottom: 28px; }
+  .setup-step { margin-bottom: 24px; }
+  .setup-step-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .setup-step input, .setup-step textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    resize: none;
+  }
+  .setup-step textarea { height: 100px; }
+  .setup-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .setup-link { color: var(--green); }
+  .setup-note { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; font-size: 11px; line-height: 1.8; color: var(--muted); margin-bottom: 16px; }
+  .setup-note code { color: var(--accent); background: var(--surface2); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+
+  /* ─── MAIN APP ─── */
+  #appScreen { padding: 0; }
+
+  .topbar {
+    padding: 56px 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .topbar-title { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--accent); }
+  .topbar-week { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+
+  .logout-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ─── WEEKLY CARD ─── */
+  .weekly-card {
+    margin: 0 16px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .hours-display {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .hours-big {
+    font-family: 'Instrument Serif', serif;
+    font-size: 52px;
+    line-height: 1;
+    color: var(--green);
+    transition: color 0.4s;
+  }
+
+  .hours-big.warn { color: var(--amber); }
+  .hours-big.danger { color: var(--red); }
+
+  .hours-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; align-self: flex-end; padding-bottom: 8px; }
+
+  .progress-track {
+    height: 4px; background: var(--surface2); border-radius: 2px; margin: 16px 0 8px; overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%; border-radius: 2px;
+    background: var(--green);
+    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1), background 0.4s;
+    max-width: 100%;
+  }
+
+  .progress-bar.warn { background: var(--amber); }
+  .progress-bar.danger { background: var(--red); }
+
+  .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+
+  .status-msg { margin-top: 14px; font-size: 11px; line-height: 1.7; }
+  .status-msg.good { color: var(--green); }
+  .status-msg.warn { color: var(--amber); }
+  .status-msg.danger { color: var(--red); }
+
+  /* ─── LOG BUTTON ─── */
+  .log-btn-wrap { padding: 0 16px 16px; }
+
+  .log-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .log-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  /* ─── HISTORY ─── */
+  .section-label {
+    padding: 0 20px 10px;
+    font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase;
+  }
+
+  .history-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 32px; }
+
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    animation: fade-up 0.3s ease;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .day-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .day-date { font-size: 13px; color: var(--accent); }
+  .day-total { font-size: 16px; color: var(--green); font-family: 'Instrument Serif', serif; }
+  .day-times { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .day-time-row { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--muted); }
+  .day-time-row span { color: var(--text); }
+  .day-card-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .day-action-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .day-action-btn.del { color: var(--red); border-color: rgba(248,113,113,0.3); }
+
+  .empty-state { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 12px; line-height: 2; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: flex-end;
+    padding: 16px;
+  }
+
+  .modal-overlay.hidden { display: none; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 12px 12px;
+    padding: 28px 24px 32px;
+    width: 100%;
+    animation: slide-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  }
+
+  @keyframes slide-up {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px; color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .field-group { margin-bottom: 16px; }
+  .field-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+
+  .time-row { display: flex; gap: 8px; }
+
+  .time-input {
+    flex: 1;
+    padding: 14px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    outline: none;
+    text-align: center;
+  }
+
+  .time-input:focus { border-color: var(--green); }
+
+  .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .toggle-label { font-size: 12px; color: var(--muted); }
+
+  .toggle {
+    position: relative; width: 44px; height: 26px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--surface2);
+    border-radius: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    height: 20px; width: 20px;
+    left: 3px; bottom: 3px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+  input:checked + .toggle-slider { background: var(--green-dim); border: 1px solid var(--green); }
+  input:checked + .toggle-slider:before { transform: translateX(18px); background: var(--green); }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-cancel {
+    flex: 1; padding: 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .modal-save {
+    flex: 2; padding: 16px;
+    background: var(--green);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .preview-hours { font-size: 12px; color: var(--green); margin-top: 10px; min-height: 18px; }
+  .form-error { font-size: 11px; color: var(--red); margin-top: 6px; min-height: 16px; }
+
+  .date-input {
+    width: 100%;
+    padding: 14px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    outline: none;
+  }
+  .date-input:focus { border-color: var(--green); }
+
+  /* scrollable content area */
+  .scroll-content { flex: 1; overflow-y: auto; }
+
+  ::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<!-- setup modal hidden, config hardcoded -->
+<div id="setupModal" style="display:none"></div>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="loginScreen" class="screen">
+  <div class="login-logo">tt.</div>
+  <div class="login-sub">Time Tracker</div>
+
+  <button class="biometric-btn" id="bioBtn" onclick="doBiometric()">
+    <div class="pulse-ring"></div>
+    <span>🪪</span>
+  </button>
+  <div class="login-hint" id="bioHint">Touch ID / Face ID</div>
+  <div class="login-error" id="loginError"></div>
+
+  <div id="pwFallback">
+    <input type="password" id="pwInput" placeholder="password" onkeydown="if(event.key==='Enter')doPassword()">
+    <button onclick="doPassword()">Unlock</button>
+  </div>
+
+  <span class="login-fallback" onclick="togglePwFallback()">Use password instead</span>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div id="appScreen" class="screen">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">This Week</div>
+      <div class="topbar-week" id="weekRange"></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">↩</button>
+  </div>
+
+  <div class="scroll-content">
+    <!-- Weekly summary card -->
+    <div class="weekly-card">
+      <div class="hours-display">
+        <div class="hours-big" id="totalHoursDisplay">0:00</div>
+        <div class="hours-label">HOURS THIS WEEK</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-labels">
+        <span>0h</span>
+        <span>19h target</span>
+        <span>20h max</span>
+      </div>
+      <div class="status-msg good" id="statusMsg"></div>
+    </div>
+
+    <!-- Log time button -->
+    <div class="log-btn-wrap">
+      <button class="log-btn" onclick="openLogModal()">
+        <span>＋</span> Log a Day
+      </button>
+    </div>
+
+    <!-- History -->
+    <div class="section-label">WEEK HISTORY</div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">No entries yet.<br>Tap <em>Log a Day</em> to start.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ LOG MODAL ══════════════ -->
+<div class="modal-overlay hidden" id="logModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Log a Day</div>
+
+    <div class="field-group">
+      <div class="field-label">Date</div>
+      <input type="date" class="date-input" id="entryDate">
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Morning shift</div>
+      <div class="time-row">
+        <input type="time" class="time-input" id="t1In" placeholder="08:00">
+        <input type="time" class="time-input" id="t1Out" placeholder="12:00">
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <label class="toggle">
+        <input type="checkbox" id="hasBreak" onchange="toggleBreakRow()" checked>
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">Lunch break (auto 30 min) / custom</span>
+    </div>
+
+    <div class="field-group" id="breakRow">
+      <div class="field-label">Afternoon shift</div>
+      <div class="time-row">
+        <input type="time" class="time-input" id="t2In" placeholder="12:30">
+        <input type="time" class="time-input" id="t2Out" placeholder="16:30">
+      </div>
+    </div>
+
+    <div class="preview-hours" id="previewHours"></div>
+    <div class="form-error" id="formError"></div>
+
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeLogModal()">Cancel</button>
+      <button class="modal-save" onclick="saveEntry()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, Timestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+// ─── CONFIG ───────────────────────────────────────────
+const APP_PASSWORD_KEY = 'tt_password_hash';
+const FIREBASE_CONFIG_KEY = 'tt_firebase_config';
+const BIOMETRIC_KEY = 'tt_biometric_registered';
+const SESSION_KEY = 'tt_session';
+
+let db = null;
+let editingId = null;
+
+// ─── UTILS ────────────────────────────────────────────
+function getWeekBounds() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  monday.setHours(0,0,0,0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23,59,59,999);
+  return { monday, sunday };
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-DE', { weekday:'short', day:'numeric', month:'short' });
+}
+
+function timeToMinutes(t) {
+  if (!t) return null;
+  const [h,m] = t.split(':').map(Number);
+  return h*60+m;
+}
+
+function minutesToHHMM(min) {
+  const h = Math.floor(Math.abs(min)/60);
+  const m = Math.abs(min)%60;
+  return `${h}:${String(m).padStart(2,'0')}`;
+}
+
+function calcMinutes(entry) {
+  const m1in = timeToMinutes(entry.t1In);
+  const m1out = timeToMinutes(entry.t1Out);
+  if (m1in===null||m1out===null) return 0;
+  let total = m1out - m1in;
+  if (entry.hasBreak && entry.t2In && entry.t2Out) {
+    const m2in = timeToMinutes(entry.t2In);
+    const m2out = timeToMinutes(entry.t2Out);
+    total += m2out - m2in;
+  }
+  return total > 0 ? total : 0;
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ─── SETUP ────────────────────────────────────────────
+window.saveSetup = async function() {
+  const raw = document.getElementById('configInput').value.trim();
+  const pw = document.getElementById('setupPassword').value;
+  const err = document.getElementById('setupError');
+  err.textContent = '';
+
+  if (!pw) { err.textContent = 'Please set a password.'; return; }
+
+  let cfg;
+  try {
+    const clean = raw.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+    cfg = JSON.parse(clean);
+    if (!cfg.projectId) throw new Error();
+  } catch(e) { err.textContent = 'Invalid config — paste the full firebaseConfig object.'; return; }
+
+  localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(cfg));
+  localStorage.setItem(APP_PASSWORD_KEY, await sha256(pw));
+  document.getElementById('setupModal').classList.add('hidden');
+  initApp();
+};
+
+// ─── FIREBASE INIT ────────────────────────────────────
+function initFirebase(cfg) {
+  const app = initializeApp(cfg);
+  db = getFirestore(app);
+}
+
+// ─── BIOMETRIC ────────────────────────────────────────
+async function registerBiometric() {
+  try {
+    const cred = await navigator.credentials.create({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rp: { name: 'TimeTrack' },
+        user: { id: new Uint8Array([1]), name: 'user', displayName: 'User' },
+        pubKeyCredParams: [{ type:'public-key', alg:-7 },{ type:'public-key', alg:-257 }],
+        authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required' },
+        timeout: 60000
+      }
+    });
+    const stored = { id: cred.id, rawId: btoa(String.fromCharCode(...new Uint8Array(cred.rawId))) };
+    localStorage.setItem(BIOMETRIC_KEY, JSON.stringify(stored));
+    return true;
+  } catch(e) { return false; }
+}
+
+async function verifyBiometric() {
+  const stored = JSON.parse(localStorage.getItem(BIOMETRIC_KEY) || 'null');
+  if (!stored) {
+    // First time: register
+    return await registerBiometric();
+  }
+  try {
+    await navigator.credentials.get({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials: [{ type:'public-key', id: Uint8Array.from(atob(stored.rawId), c=>c.charCodeAt(0)) }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+window.doBiometric = async function() {
+  document.getElementById('loginError').textContent = '';
+  const btn = document.getElementById('bioBtn');
+  btn.style.opacity = '0.6';
+  try {
+    const ok = await verifyBiometric();
+    if (ok) { unlockApp(); }
+    else { document.getElementById('loginError').textContent = 'Authentication failed.'; }
+  } catch(e) {
+    document.getElementById('loginError').textContent = 'Biometrics not available on this device.';
+  }
+  btn.style.opacity = '1';
+};
+
+window.togglePwFallback = function() {
+  const el = document.getElementById('pwFallback');
+  el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+};
+
+window.doPassword = async function() {
+  const pw = document.getElementById('pwInput').value;
+  const hash = await sha256(pw);
+  const stored = localStorage.getItem(APP_PASSWORD_KEY);
+  if (hash === stored) { unlockApp(); }
+  else { document.getElementById('loginError').textContent = 'Wrong password.'; }
+};
+
+function unlockApp() {
+  sessionStorage.setItem(SESSION_KEY, '1');
+  showScreen('appScreen');
+  loadWeek();
+}
+
+window.logout = function() {
+  sessionStorage.removeItem(SESSION_KEY);
+  showScreen('loginScreen');
+};
+
+// ─── SCREENS ──────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── LOAD WEEK ────────────────────────────────────────
+async function loadWeek() {
+  const { monday, sunday } = getWeekBounds();
+  document.getElementById('weekRange').textContent =
+    monday.toLocaleDateString('en-DE',{day:'numeric',month:'short'}) + ' – ' +
+    sunday.toLocaleDateString('en-DE',{day:'numeric',month:'short',year:'numeric'});
+
+  // Fetch entries from Firestore
+  let entries = [];
+  try {
+    const q = query(collection(db,'entries'),
+      where('weekStart','==', monday.toISOString().split('T')[0]));
+    const snap = await getDocs(q);
+    snap.forEach(d => entries.push({ id:d.id, ...d.data() }));
+  } catch(e) {
+    console.error('Firestore error', e);
+  }
+
+  // Sort by date desc
+  entries.sort((a,b)=> b.date.localeCompare(a.date));
+
+  // Total
+  let totalMin = 0;
+  entries.forEach(e => totalMin += calcMinutes(e));
+
+  updateSummary(totalMin);
+  renderHistory(entries);
+}
+
+function updateSummary(totalMin) {
+  const display = document.getElementById('totalHoursDisplay');
+  const bar = document.getElementById('progressBar');
+  const msg = document.getElementById('statusMsg');
+
+  display.textContent = minutesToHHMM(totalMin);
+  const pct = Math.min((totalMin / (20*60)) * 100, 100);
+  bar.style.width = pct + '%';
+
+  const toTarget = 19*60 - totalMin;
+  const overMax = totalMin - 20*60;
+
+  display.className = 'hours-big';
+  bar.className = 'progress-bar';
+  msg.className = 'status-msg';
+
+  if (totalMin < 19*60) {
+    msg.textContent = `${minutesToHHMM(toTarget)} still needed to reach 19h target`;
+    msg.classList.add('good');
+  } else if (totalMin <= 20*60) {
+    const rem = 20*60 - totalMin;
+    msg.textContent = `✓ Target reached! ${minutesToHHMM(rem)} buffer before 20h cap`;
+    msg.classList.add('warn');
+    display.classList.add('warn');
+    bar.classList.add('warn');
+  } else {
+    msg.textContent = `⚠ Over 20h limit by ${minutesToHHMM(overMax)}`;
+    msg.classList.add('danger');
+    display.classList.add('danger');
+    bar.classList.add('danger');
+  }
+}
+
+function renderHistory(entries) {
+  const list = document.getElementById('historyList');
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="empty-state">No entries yet.<br>Tap <em>Log a Day</em> to start.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  entries.forEach(entry => {
+    const min = calcMinutes(entry);
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    let timesHTML = `
+      <div class="day-time-row">Morning <span>${entry.t1In} → ${entry.t1Out}</span></div>`;
+    if (entry.hasBreak && entry.t2In) {
+      timesHTML += `<div class="day-time-row">Afternoon <span>${entry.t2In} → ${entry.t2Out}</span></div>`;
+    }
+    card.innerHTML = `
+      <div class="day-card-header">
+        <div class="day-date">${formatDate(entry.date)}</div>
+        <div class="day-total">${minutesToHHMM(min)}h</div>
+      </div>
+      <div class="day-times">${timesHTML}</div>
+      <div class="day-card-actions">
+        <button class="day-action-btn" onclick="openEdit('${entry.id}')">Edit</button>
+        <button class="day-action-btn del" onclick="deleteEntry('${entry.id}')">Delete</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+// ─── MODAL ────────────────────────────────────────────
+window.openLogModal = function() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Log a Day';
+  document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('t1In').value = '';
+  document.getElementById('t1Out').value = '';
+  document.getElementById('t2In').value = '';
+  document.getElementById('t2Out').value = '';
+  document.getElementById('hasBreak').checked = true;
+  document.getElementById('breakRow').style.display = 'block';
+  document.getElementById('previewHours').textContent = '';
+  document.getElementById('formError').textContent = '';
+  document.getElementById('logModal').classList.remove('hidden');
+};
+
+window.openEdit = async function(id) {
+  // find entry
+  const snap = await getDocs(collection(db,'entries'));
+  let entry;
+  snap.forEach(d => { if(d.id===id) entry = { id:d.id, ...d.data() }; });
+  if (!entry) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Entry';
+  document.getElementById('entryDate').value = entry.date;
+  document.getElementById('t1In').value = entry.t1In||'';
+  document.getElementById('t1Out').value = entry.t1Out||'';
+  document.getElementById('hasBreak').checked = !!entry.hasBreak;
+  document.getElementById('breakRow').style.display = entry.hasBreak ? 'block' : 'none';
+  document.getElementById('t2In').value = entry.t2In||'';
+  document.getElementById('t2Out').value = entry.t2Out||'';
+  document.getElementById('previewHours').textContent = '';
+  document.getElementById('formError').textContent = '';
+  document.getElementById('logModal').classList.remove('hidden');
+};
+
+window.closeLogModal = function() {
+  document.getElementById('logModal').classList.add('hidden');
+};
+
+window.toggleBreakRow = function() {
+  const has = document.getElementById('hasBreak').checked;
+  document.getElementById('breakRow').style.display = has ? 'block' : 'none';
+  updatePreview();
+};
+
+// Live preview
+['t1In','t1Out','t2In','t2Out','hasBreak'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', updatePreview);
+});
+
+function updatePreview() {
+  const entry = getFormEntry();
+  const min = calcMinutes(entry);
+  const prev = document.getElementById('previewHours');
+  if (min > 0) prev.textContent = `= ${minutesToHHMM(min)} hours`;
+  else prev.textContent = '';
+}
+
+function getFormEntry() {
+  return {
+    date: document.getElementById('entryDate').value,
+    t1In: document.getElementById('t1In').value,
+    t1Out: document.getElementById('t1Out').value,
+    hasBreak: document.getElementById('hasBreak').checked,
+    t2In: document.getElementById('t2In').value,
+    t2Out: document.getElementById('t2Out').value,
+  };
+}
+
+window.saveEntry = async function() {
+  const entry = getFormEntry();
+  const err = document.getElementById('formError');
+  err.textContent = '';
+
+  if (!entry.date || !entry.t1In || !entry.t1Out) {
+    err.textContent = 'Please fill in date and morning times.'; return;
+  }
+  if (timeToMinutes(entry.t1Out) <= timeToMinutes(entry.t1In)) {
+    err.textContent = 'Check-out must be after check-in.'; return;
+  }
+  if (entry.hasBreak) {
+    if (!entry.t2In || !entry.t2Out) {
+      // Auto 30 min break
+      const m1out = timeToMinutes(entry.t1Out);
+      const m2in = m1out + 30;
+      entry.t2In = `${Math.floor(m2in/60)}:${String(m2in%60).padStart(2,'0')}`;
+    }
+    if (timeToMinutes(entry.t2Out) <= timeToMinutes(entry.t2In)) {
+      err.textContent = 'Afternoon end must be after start.'; return;
+    }
+  }
+
+  const { monday } = getWeekBounds();
+  const entryDate = new Date(entry.date + 'T00:00:00');
+  const weekStart = monday.toISOString().split('T')[0];
+
+  // Compute weekStart from entry date
+  const d = entryDate.getDay();
+  const mon = new Date(entryDate);
+  mon.setDate(entryDate.getDate() - (d===0 ? 6 : d-1));
+  const entryWeekStart = mon.toISOString().split('T')[0];
+
+  const data = { ...entry, weekStart: entryWeekStart, updatedAt: Date.now() };
+
+  try {
+    if (editingId) {
+      await deleteDoc(doc(db,'entries',editingId));
+    }
+    await addDoc(collection(db,'entries'), data);
+    closeLogModal();
+    loadWeek();
+  } catch(e) {
+    err.textContent = 'Save failed. Check Firebase config.';
+    console.error(e);
+  }
+};
+
+window.deleteEntry = async function(id) {
+  if (!confirm('Delete this entry?')) return;
+  await deleteDoc(doc(db,'entries',id));
+  loadWeek();
+};
+
+// ─── INIT ─────────────────────────────────────────────
+const HARDCODED_CONFIG = {
+  apiKey: "AIzaSyAZGNx1E4ITYoouLots3yxoClWJb3Hrp4Q",
+  authDomain: "timetrack-89a88.firebaseapp.com",
+  projectId: "timetrack-89a88",
+  storageBucket: "timetrack-89a88.firebasestorage.app",
+  messagingSenderId: "794920185816",
+  appId: "1:794920185816:web:84909a0d608d0238fa0cad"
+};
+
+function initApp() {
+  // Always use hardcoded config, skip setup screen
+  document.getElementById('setupModal').classList.add('hidden');
+  initFirebase(HARDCODED_CONFIG);
+
+  // Set default password "1234" if none configured yet
+  if (!localStorage.getItem(APP_PASSWORD_KEY)) {
+    sha256('1234').then(h => localStorage.setItem(APP_PASSWORD_KEY, h));
+  }
+
+  // Check session
+  if (sessionStorage.getItem(SESSION_KEY)) {
+    unlockApp(); return;
+  }
+
+  showScreen('loginScreen');
+
+  // Auto-trigger biometric if supported
+  if (window.PublicKeyCredential && localStorage.getItem(BIOMETRIC_KEY)) {
+    document.getElementById('bioHint').textContent = 'Touch ID / Face ID';
+    setTimeout(()=> window.doBiometric(), 400);
+  } else if (!window.PublicKeyCredential) {
+    document.getElementById('bioBtn').style.display = 'none';
+    document.getElementById('bioHint').textContent = 'Biometrics not supported on this browser';
+    window.togglePwFallback();
+  }
+}
+
+initApp();
+</script>
+</body>
+</html>
