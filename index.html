@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TimeTrack">
+<meta name="theme-color" content="#0e0e0f">
+<link rel="manifest" href="manifest.json">
 <title>TimeTrack</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -16,6 +18,7 @@
   --amber:#fbbf24; --red:#f87171; --accent:#e8e0d5; --radius:16px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{color-scheme:dark;}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
   min-height:100vh;min-height:-webkit-fill-available;padding-bottom:env(safe-area-inset-bottom);}
 
@@ -24,6 +27,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
 
 /* LOGIN */
 #loginScreen{align-items:center;justify-content:center;padding:40px 24px;
+  padding-top:calc(40px + env(safe-area-inset-top, 0px));
   background:radial-gradient(ellipse at 50% 0%,#1a2a1a 0%,var(--bg) 60%);}
 .login-logo{font-family:'Instrument Serif',serif;font-size:72px;color:var(--green);
   letter-spacing:-3px;margin-bottom:6px;line-height:1;}
@@ -58,7 +62,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
 
 /* TOPBAR */
 #appScreen{padding:0;}
-.topbar{padding:52px 20px 14px;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;}
+.topbar{padding:calc(env(safe-area-inset-top, 20px) + 12px) 20px 14px;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;}
 .topbar-back,.topbar-settings{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
   background:var(--surface);color:var(--muted);cursor:pointer;
   display:flex;align-items:center;justify-content:center;}
@@ -96,7 +100,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
 
 /* HISTORY */
 .section-label{padding:0 20px 10px;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
-.weeks-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;padding-bottom:32px;}
+.weeks-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;
+  padding-bottom:calc(32px + env(safe-area-inset-bottom, 0px));}
 .week-accordion{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .week-accordion-header{display:flex;align-items:center;justify-content:space-between;
   padding:16px;cursor:pointer;user-select:none;}
@@ -131,11 +136,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
 
 /* MODALS */
 .modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.72);
-  backdrop-filter:blur(10px);display:flex;align-items:flex-end;padding:16px;}
+  backdrop-filter:blur(10px);display:flex;align-items:flex-end;padding:0;}
 .modal-overlay.hidden{display:none;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 12px 12px;
-  padding:24px 22px 28px;width:100%;animation:slide-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
-  max-height:88vh;overflow-y:auto;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;
+  padding:24px 22px calc(28px + env(safe-area-inset-bottom));width:100%;
+  animation:slide-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 @keyframes slide-up{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-title{font-family:'Instrument Serif',serif;font-size:24px;color:var(--accent);margin-bottom:20px;}
 .field-group{margin-bottom:14px;}
@@ -143,11 +149,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;
 .time-row{display:flex;gap:8px;}
 .time-input{flex:1;padding:13px 8px;background:var(--surface2);border:1px solid var(--border);
   border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;
-  text-align:center;min-width:0;}
+  text-align:center;min-width:0;-webkit-appearance:none;appearance:none;color-scheme:dark;}
 .time-input:focus{border-color:var(--green);}
 .date-input{width:100%;padding:13px 12px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;}
+  border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;outline:none;
+  -webkit-appearance:none;appearance:none;color-scheme:dark;text-align:left;}
 .date-input:focus{border-color:var(--green);}
+input[type="date"].date-input{display:block;min-height:46px;line-height:1.2;}
 .toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px;
   background:var(--surface2);border-radius:10px;}
 .toggle-label{font-size:12px;color:var(--muted);flex:1;line-height:1.4;}
